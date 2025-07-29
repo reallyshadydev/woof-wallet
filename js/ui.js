@@ -126,9 +126,18 @@ class WalletUI {
     }
 
     /**
-     * Set up keyboard navigation
+     * Enhanced keyboard navigation for desktop
      */
     setupKeyboardNavigation() {
+        // Enable visual keyboard navigation indicator
+        document.addEventListener('keydown', () => {
+            document.body.classList.add('keyboard-navigation');
+        });
+
+        document.addEventListener('click', () => {
+            document.body.classList.remove('keyboard-navigation');
+        });
+
         // Tab navigation
         document.addEventListener('keydown', (e) => {
             if (e.target.classList.contains('tab-button')) {
@@ -136,31 +145,83 @@ class WalletUI {
             }
         });
 
-        // General keyboard shortcuts
+        // Enhanced keyboard shortcuts for desktop
         document.addEventListener('keydown', (e) => {
+            // Quick tab switching
             if (e.ctrlKey || e.metaKey) {
                 switch (e.key) {
                     case '1':
                         e.preventDefault();
                         this.switchToTab('overview');
+                        this.announceToScreenReader('Switched to overview tab');
                         break;
                     case '2':
                         e.preventDefault();
                         this.switchToTab('doginals');
+                        this.announceToScreenReader('Switched to doginals tab');
                         break;
                     case '3':
                         e.preventDefault();
                         this.switchToTab('send');
+                        this.announceToScreenReader('Switched to send tab');
                         break;
                     case '4':
                         e.preventDefault();
                         this.switchToTab('history');
+                        this.announceToScreenReader('Switched to history tab');
                         break;
                     case 'r':
                         e.preventDefault();
                         this.refreshCurrentTab();
+                        this.announceToScreenReader('Refreshing current tab');
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        this.copyWalletAddress();
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        this.closeActiveModal();
                         break;
                 }
+            }
+
+            // Quick actions without modifier keys
+            if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+                switch (e.key) {
+                    case 'Escape':
+                        this.closeActiveModal();
+                        break;
+                    case 'F5':
+                        e.preventDefault();
+                        this.refreshCurrentTab();
+                        break;
+                }
+            }
+
+            // Alt key shortcuts for accessibility
+            if (e.altKey) {
+                switch (e.key) {
+                    case 's':
+                        e.preventDefault();
+                        this.focusOnSendForm();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        this.openReceiveModal();
+                        break;
+                    case 'h':
+                        e.preventDefault();
+                        this.showKeyboardShortcuts();
+                        break;
+                }
+            }
+        });
+
+        // Enhanced modal keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (this.isModalOpen()) {
+                this.handleModalKeyNavigation(e);
             }
         });
     }
@@ -196,6 +257,34 @@ class WalletUI {
                 e.preventDefault();
                 e.target.click();
                 break;
+        }
+    }
+
+    /**
+     * Handle keyboard navigation within modals
+     */
+    handleModalKeyNavigation(e) {
+        const activeModal = document.querySelector('.modal.active');
+        if (!activeModal) return;
+
+        const focusableElements = activeModal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                if (document.activeElement === firstElement) {
+                    e.preventDefault();
+                    lastElement.focus();
+                }
+            } else {
+                if (document.activeElement === lastElement) {
+                    e.preventDefault();
+                    firstElement.focus();
+                }
+            }
         }
     }
 
@@ -485,6 +574,7 @@ class WalletUI {
         this.setupPasswordSetup();
         this.setupWalletUnlock();
         this.setupActivityTracking();
+        this.setupDesktopHoverEffects(); // Call new method
     }
 
     /**
@@ -2286,6 +2376,266 @@ class WalletUI {
         } finally {
             this.setButtonLoading('unlock_wallet_button', false);
         }
+    }
+
+    /**
+     * Desktop-optimized hover effects
+     */
+    setupDesktopHoverEffects() {
+        // Enhanced button hover effects
+        document.querySelectorAll('.btn, .tab-button, .action-button').forEach(button => {
+            button.addEventListener('mouseenter', (e) => {
+                if (!e.target.disabled) {
+                    e.target.style.transform = 'translateY(-2px) scale(1.02)';
+                    e.target.style.boxShadow = 'var(--shadow-lg)';
+                }
+            });
+
+            button.addEventListener('mouseleave', (e) => {
+                e.target.style.transform = '';
+                e.target.style.boxShadow = '';
+            });
+        });
+
+        // Card hover effects
+        document.querySelectorAll('.card, .stat-card').forEach(card => {
+            card.addEventListener('mouseenter', (e) => {
+                e.target.style.transform = 'translateY(-4px) scale(1.01)';
+                e.target.style.boxShadow = 'var(--shadow-xl)';
+            });
+
+            card.addEventListener('mouseleave', (e) => {
+                e.target.style.transform = '';
+                e.target.style.boxShadow = '';
+            });
+        });
+
+        // Tooltip enhancements
+        this.setupAdvancedTooltips();
+    }
+
+    /**
+     * Advanced tooltip system
+     */
+    setupAdvancedTooltips() {
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+            element.addEventListener('mouseenter', (e) => {
+                this.showTooltip(e.target);
+            });
+
+            element.addEventListener('mouseleave', (e) => {
+                this.hideTooltip(e.target);
+            });
+
+            element.addEventListener('focus', (e) => {
+                this.showTooltip(e.target);
+            });
+
+            element.addEventListener('blur', (e) => {
+                this.hideTooltip(e.target);
+            });
+        });
+    }
+
+    /**
+     * Show tooltip with animation
+     */
+    showTooltip(element) {
+        const tooltip = element.querySelector('.tooltip-content') || this.createTooltip(element);
+        tooltip.style.opacity = '1';
+        tooltip.style.visibility = 'visible';
+        tooltip.style.transform = 'translateX(-50%) translateY(-4px)';
+    }
+
+    /**
+     * Hide tooltip with animation
+     */
+    hideTooltip(element) {
+        const tooltip = element.querySelector('.tooltip-content');
+        if (tooltip) {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.transform = 'translateX(-50%) translateY(0)';
+        }
+    }
+
+    /**
+     * Create tooltip element
+     */
+    createTooltip(element) {
+        const tooltipText = element.getAttribute('data-tooltip');
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip-content';
+        tooltip.textContent = tooltipText;
+        tooltip.style.cssText = `
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        `;
+        element.style.position = 'relative';
+        element.appendChild(tooltip);
+        return tooltip;
+    }
+
+    /**
+     * Copy wallet address with enhanced feedback
+     */
+    async copyWalletAddress() {
+        const addressElement = document.getElementById('wallet_address');
+        if (!addressElement) return;
+
+        const address = addressElement.textContent;
+        try {
+            await navigator.clipboard.writeText(address);
+            this.showCopyFeedback('Address copied to clipboard!');
+            this.announceToScreenReader('Wallet address copied to clipboard');
+        } catch (err) {
+            this.showCopyFeedback('Failed to copy address', 'error');
+        }
+    }
+
+    /**
+     * Show visual feedback for copy operations
+     */
+    showCopyFeedback(message, type = 'success') {
+        const feedback = document.createElement('div');
+        feedback.className = `copy-feedback copy-feedback-${type}`;
+        feedback.textContent = message;
+        feedback.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: ${type === 'success' ? 'var(--color-secondary)' : 'var(--text-error)'};
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        `;
+        
+        document.body.appendChild(feedback);
+        
+        setTimeout(() => {
+            feedback.style.transform = 'translateX(0)';
+        }, 100);
+        
+        setTimeout(() => {
+            feedback.style.transform = 'translateX(100%)';
+            setTimeout(() => feedback.remove(), 300);
+        }, 3000);
+    }
+
+    /**
+     * Focus on send form for quick access
+     */
+    focusOnSendForm() {
+        this.switchToTab('send');
+        setTimeout(() => {
+            const addressInput = document.getElementById('send_address');
+            if (addressInput) {
+                addressInput.focus();
+                this.announceToScreenReader('Send form address field focused');
+            }
+        }, 100);
+    }
+
+    /**
+     * Show keyboard shortcuts help
+     */
+    showKeyboardShortcuts() {
+        const shortcuts = [
+            { keys: 'Ctrl/Cmd + 1-4', description: 'Switch between tabs' },
+            { keys: 'Ctrl/Cmd + R', description: 'Refresh current tab' },
+            { keys: 'Ctrl/Cmd + C', description: 'Copy wallet address' },
+            { keys: 'Alt + S', description: 'Focus on send form' },
+            { keys: 'Alt + R', description: 'Open receive modal' },
+            { keys: 'Alt + H', description: 'Show this help' },
+            { keys: 'Escape', description: 'Close modals and dialogs' },
+            { keys: 'Tab/Shift+Tab', description: 'Navigate through elements' },
+            { keys: 'Arrow Keys', description: 'Navigate tabs when focused' }
+        ];
+
+        let helpContent = '<div class="keyboard-shortcuts-help">';
+        helpContent += '<h3>Keyboard Shortcuts</h3>';
+        helpContent += '<div class="shortcuts-list">';
+        
+        shortcuts.forEach(shortcut => {
+            helpContent += `
+                <div class="shortcut-item">
+                    <kbd class="shortcut-keys">${shortcut.keys}</kbd>
+                    <span class="shortcut-description">${shortcut.description}</span>
+                </div>
+            `;
+        });
+        
+        helpContent += '</div></div>';
+        
+        this.showInfoModal('Keyboard Shortcuts', helpContent);
+    }
+
+    /**
+     * Check if any modal is currently open
+     */
+    isModalOpen() {
+        return document.querySelector('.modal.active') !== null;
+    }
+
+    /**
+     * Show error modal
+     */
+    showErrorModal(message, title = 'Error') {
+        const errorMessage = document.getElementById('error_message');
+        const errorTitle = document.getElementById('error_modal_title');
+        if (errorMessage) errorMessage.textContent = message;
+        if (errorTitle) errorTitle.textContent = title;
+        this.showModal('error_modal');
+    }
+
+    /**
+     * Show success modal
+     */
+    showSuccessModal(txid) {
+        const txidElement = document.getElementById('success_txid');
+        const explorerBtn = document.getElementById('view_explorer_button');
+
+        if (txidElement) {
+            txidElement.textContent = txid;
+        }
+
+        if (explorerBtn) {
+            explorerBtn.onclick = () => {
+                window.open(`https://dogechain.info/tx/${txid}`, '_blank');
+            };
+        }
+
+        this.showModal('success_modal');
+    }
+
+    /**
+     * Show info modal
+     */
+    showInfoModal(title, content) {
+        const infoTitle = document.getElementById('info_modal_title');
+        const infoContent = document.getElementById('info_modal_content');
+        if (infoTitle) infoTitle.textContent = title;
+        if (infoContent) infoContent.innerHTML = content;
+        this.showModal('info_modal');
     }
 }
 
