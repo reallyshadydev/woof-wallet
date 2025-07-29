@@ -18,6 +18,36 @@
         </div>
     </div>
 
+    <!-- Wallet Lock Screen -->
+    <div id="wallet_lock_screen" class="screen">
+        <div class="container">
+            <div class="logo">🔒</div>
+            <h1>Wallet Locked</h1>
+            <div class="lock-content">
+                <div class="info-box">
+                    <p>Your wallet has been locked for security. Enter your password to unlock and continue using your wallet.</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="unlock_password_input">Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="unlock_password_input" placeholder="Enter your password" aria-label="Password to unlock wallet">
+                        <button type="button" id="toggle_unlock_visibility" class="password-toggle" aria-label="Toggle password visibility">👁️</button>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="unlock_wallet_button" class="primary-button" disabled>Unlock Wallet</button>
+                    <button id="logout_from_lock_button" class="secondary-button">Logout</button>
+                </div>
+
+                <div class="security-info">
+                    <p><small>💡 Your wallet automatically locks after 15 minutes of inactivity for your security.</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Terms Acceptance Screen -->
     <div id="accept_terms_screen" class="screen">
         <div class="container">
@@ -74,6 +104,89 @@
         </div>
     </div>
 
+    <!-- Password Setup Screen -->
+    <div id="password_setup_screen" class="screen">
+        <div class="container">
+            <h1>🔒 Secure Your Wallet</h1>
+            <div class="password-setup-content">
+                <div class="info-box">
+                    <h3>Create a Strong Password</h3>
+                    <p>This password will be required to view your seed phrase and private key from the settings menu.</p>
+                </div>
+                
+                <div class="password-requirements">
+                    <h4>Password Requirements:</h4>
+                    <ul id="password_requirements_list">
+                        <li id="req_length" class="requirement">
+                            <span class="req-icon">❌</span>
+                            At least 8 characters long
+                        </li>
+                        <li id="req_uppercase" class="requirement">
+                            <span class="req-icon">❌</span>
+                            Contains uppercase letter (A-Z)
+                        </li>
+                        <li id="req_lowercase" class="requirement">
+                            <span class="req-icon">❌</span>
+                            Contains lowercase letter (a-z)
+                        </li>
+                        <li id="req_number" class="requirement">
+                            <span class="req-icon">❌</span>
+                            Contains number (0-9)
+                        </li>
+                        <li id="req_special" class="requirement">
+                            <span class="req-icon">❌</span>
+                            Contains special character (!@#$%^&*)
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="input-group">
+                    <label for="wallet_password_input">Create Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="wallet_password_input" placeholder="Enter a strong password" aria-describedby="password_strength">
+                        <button type="button" id="toggle_password_visibility" class="password-toggle" aria-label="Toggle password visibility">👁️</button>
+                    </div>
+                    <div id="password_strength" class="password-strength">
+                        <div class="strength-meter">
+                            <div id="strength_bar" class="strength-bar"></div>
+                        </div>
+                        <span id="strength_text" class="strength-text">Password strength: Weak</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="wallet_password_confirm">Confirm Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="wallet_password_confirm" placeholder="Confirm your password">
+                        <button type="button" id="toggle_confirm_visibility" class="password-toggle" aria-label="Toggle password visibility">👁️</button>
+                    </div>
+                    <div id="password_match_feedback" class="password-feedback"></div>
+                </div>
+
+                <div class="biometric-option" id="biometric_setup_section" style="display: none;">
+                    <h4>🔐 Enhanced Security (Optional)</h4>
+                    <p>Enable biometric authentication for an additional layer of security when viewing sensitive information.</p>
+                    <button id="enable_biometric_button" class="biometric-toggle" disabled>Enable Biometric Authentication</button>
+                </div>
+
+                <div class="security-tips">
+                    <h4>💡 Security Tips:</h4>
+                    <ul>
+                        <li>Use a unique password you don't use elsewhere</li>
+                        <li>Consider using a password manager</li>
+                        <li>Never share your password with anyone</li>
+                        <li>Store it securely - if forgotten, you'll need your seed phrase to recover</li>
+                    </ul>
+                </div>
+
+                <div class="button-group">
+                    <button id="setup_password_button" class="primary-button" disabled>Secure Wallet</button>
+                    <button id="back_to_create_button" class="secondary-button">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Import Options Screen -->
     <div id="import_options_screen" class="screen">
         <div class="container">
@@ -105,7 +218,7 @@
             <div class="seed-input-container">
                 <textarea id="seed_textarea" placeholder="Enter your 12-word recovery phrase here..." rows="4"></textarea>
             </div>
-            <button id="import_seed_ok_button" class="primary-button">Import Wallet</button>
+            <button id="import_seed_ok_button" class="primary-button">Continue to Password Setup</button>
             <button id="back_to_import_options_button" class="secondary-button">Back</button>
         </div>
     </div>
@@ -117,7 +230,7 @@
             <div class="key-input-container">
                 <textarea id="private_key_textarea" placeholder="Enter your WIF private key here..." rows="3"></textarea>
             </div>
-            <button id="import_key_ok_button" class="primary-button">Import Wallet</button>
+            <button id="import_key_ok_button" class="primary-button">Continue to Password Setup</button>
             <button id="back_to_import_options_button2" class="secondary-button">Back</button>
         </div>
     </div>

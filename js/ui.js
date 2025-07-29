@@ -44,7 +44,7 @@ class WalletUI {
         // Create wallet
         const createOkBtn = document.getElementById('create_wallet_ok_button');
         if (createOkBtn) {
-            createOkBtn.addEventListener('click', () => this.handleCreateWallet());
+            createOkBtn.addEventListener('click', () => this.showPasswordSetup());
         }
 
         // Import options
@@ -64,11 +64,11 @@ class WalletUI {
         const importKeyOkBtn = document.getElementById('import_key_ok_button');
         
         if (importSeedOkBtn) {
-            importSeedOkBtn.addEventListener('click', () => this.handleImportSeed());
+            importSeedOkBtn.addEventListener('click', () => this.handleImportSeedValidation());
         }
         
         if (importKeyOkBtn) {
-            importKeyOkBtn.addEventListener('click', () => this.handleImportKey());
+            importKeyOkBtn.addEventListener('click', () => this.handleImportKeyValidation());
         }
 
         // Back buttons
@@ -88,6 +88,15 @@ class WalletUI {
 
         // Copy buttons
         this.setupCopyButtons();
+
+        // Password setup
+        this.setupPasswordSetup();
+
+        // Wallet unlock
+        this.setupWalletUnlock();
+
+        // Activity tracking for auto-lock
+        this.setupActivityTracking();
     }
 
     /**
@@ -1146,21 +1155,7 @@ class WalletUI {
         this.showModal('settings_modal');
     }
 
-    /**
-     * Request seed phrase with authentication
-     */
-    requestSeedPhrase() {
-        this.currentSensitiveAction = 'seed_phrase';
-        this.showAuthModal('Seed Phrase Access', 'Enter your password to view the seed phrase');
-    }
 
-    /**
-     * Request private key with authentication
-     */
-    requestPrivateKey() {
-        this.currentSensitiveAction = 'private_key';
-        this.showAuthModal('Private Key Access', 'Enter your password to view the private key');
-    }
 
     /**
      * Show authentication modal
@@ -1183,36 +1178,7 @@ class WalletUI {
         this.showModal('auth_modal');
     }
 
-    /**
-     * Handle authentication
-     */
-    async handleAuthentication() {
-        const passwordInput = document.getElementById('main_password_input');
-        const password = passwordInput ? passwordInput.value : '';
 
-        if (password.length < 4) {
-            this.showErrorModal('Password must be at least 4 characters long.');
-            return;
-        }
-
-        try {
-            const isValid = await wallet.verifyPassword(password);
-            
-            if (isValid) {
-                this.hideModal('auth_modal');
-                this.showSensitiveData();
-            } else {
-                this.showErrorModal('Incorrect password. Please try again.');
-                if (passwordInput) {
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                }
-            }
-        } catch (error) {
-            console.error('Authentication error:', error);
-            this.showErrorModal('Authentication failed. Please try again.');
-        }
-    }
 
     /**
      * Show sensitive data
@@ -1308,6 +1274,566 @@ class WalletUI {
         } catch (error) {
             console.error('Logout error:', error);
             this.showErrorModal('Failed to logout. Please try again.');
+        }
+    }
+
+    /**
+     * Set up password setup functionality
+     */
+    setupPasswordSetup() {
+        // Password input validation
+        const passwordInput = document.getElementById('wallet_password_input');
+        const confirmInput = document.getElementById('wallet_password_confirm');
+        const setupButton = document.getElementById('setup_password_button');
+        const backButton = document.getElementById('back_to_create_button');
+
+        // Password visibility toggles
+        const togglePassword = document.getElementById('toggle_password_visibility');
+        const toggleConfirm = document.getElementById('toggle_confirm_visibility');
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', () => this.validatePasswordInput());
+        }
+
+        if (confirmInput) {
+            confirmInput.addEventListener('input', () => this.validatePasswordMatch());
+        }
+
+        if (setupButton) {
+            setupButton.addEventListener('click', () => this.handlePasswordSetup());
+        }
+
+        if (backButton) {
+            backButton.addEventListener('click', () => this.showCreateScreen());
+        }
+
+        if (togglePassword) {
+            togglePassword.addEventListener('click', () => this.togglePasswordVisibility('wallet_password_input', 'toggle_password_visibility'));
+        }
+
+        if (toggleConfirm) {
+            toggleConfirm.addEventListener('click', () => this.togglePasswordVisibility('wallet_password_confirm', 'toggle_confirm_visibility'));
+        }
+
+        // Biometric setup
+        const biometricButton = document.getElementById('enable_biometric_button');
+        if (biometricButton) {
+            biometricButton.addEventListener('click', () => this.handleBiometricSetup());
+        }
+    }
+
+    /**
+     * Show password setup screen
+     */
+    showPasswordSetup() {
+        this.currentScreen = 'password_setup_screen';
+        this.hideAllScreens();
+        document.getElementById('password_setup_screen').classList.add('active');
+        
+        // Reset password inputs
+        const passwordInput = document.getElementById('wallet_password_input');
+        const confirmInput = document.getElementById('wallet_password_confirm');
+        
+        if (passwordInput) passwordInput.value = '';
+        if (confirmInput) confirmInput.value = '';
+        
+        this.validatePasswordInput();
+        this.validatePasswordMatch();
+        
+        // Focus on password input
+        if (passwordInput) {
+            setTimeout(() => passwordInput.focus(), 100);
+        }
+
+        // Check and setup biometric option
+        this.setupBiometricOption();
+    }
+
+    /**
+     * Validate password input and update UI
+     */
+    validatePasswordInput() {
+        const passwordInput = document.getElementById('wallet_password_input');
+        const password = passwordInput ? passwordInput.value : '';
+        
+        const validation = wallet.validatePasswordStrength(password);
+        
+        // Update requirement indicators
+        this.updateRequirement('req_length', validation.requirements.length);
+        this.updateRequirement('req_uppercase', validation.requirements.uppercase);
+        this.updateRequirement('req_lowercase', validation.requirements.lowercase);
+        this.updateRequirement('req_number', validation.requirements.number);
+        this.updateRequirement('req_special', validation.requirements.special);
+        
+        // Update strength meter
+        this.updateStrengthMeter(validation.strength);
+        
+        // Update form validity
+        this.updatePasswordFormValidity();
+        
+        return validation;
+    }
+
+    /**
+     * Validate password match
+     */
+    validatePasswordMatch() {
+        const passwordInput = document.getElementById('wallet_password_input');
+        const confirmInput = document.getElementById('wallet_password_confirm');
+        const feedback = document.getElementById('password_match_feedback');
+        
+        const password = passwordInput ? passwordInput.value : '';
+        const confirm = confirmInput ? confirmInput.value : '';
+        
+        if (!feedback) return;
+        
+        if (confirm === '') {
+            feedback.textContent = '';
+            feedback.className = 'password-feedback';
+        } else if (password === confirm) {
+            feedback.textContent = '✓ Passwords match';
+            feedback.className = 'password-feedback match';
+        } else {
+            feedback.textContent = '✗ Passwords do not match';
+            feedback.className = 'password-feedback mismatch';
+        }
+        
+        this.updatePasswordFormValidity();
+    }
+
+    /**
+     * Update requirement indicator
+     */
+    updateRequirement(reqId, satisfied) {
+        const element = document.getElementById(reqId);
+        if (!element) return;
+        
+        const icon = element.querySelector('.req-icon');
+        if (icon) {
+            icon.textContent = satisfied ? '✓' : '❌';
+        }
+        
+        if (satisfied) {
+            element.classList.add('satisfied');
+        } else {
+            element.classList.remove('satisfied');
+        }
+    }
+
+    /**
+     * Update strength meter
+     */
+    updateStrengthMeter(strength) {
+        const strengthBar = document.getElementById('strength_bar');
+        const strengthText = document.getElementById('strength_text');
+        
+        if (strengthBar) {
+            strengthBar.className = `strength-bar ${strength}`;
+        }
+        
+        if (strengthText) {
+            strengthText.textContent = `Password strength: ${strength.charAt(0).toUpperCase() + strength.slice(1)}`;
+            strengthText.className = `strength-text ${strength}`;
+        }
+    }
+
+    /**
+     * Update password form validity
+     */
+    updatePasswordFormValidity() {
+        const passwordInput = document.getElementById('wallet_password_input');
+        const confirmInput = document.getElementById('wallet_password_confirm');
+        const setupButton = document.getElementById('setup_password_button');
+        
+        const password = passwordInput ? passwordInput.value : '';
+        const confirm = confirmInput ? confirmInput.value : '';
+        
+        const validation = wallet.validatePasswordStrength(password);
+        const passwordsMatch = password === confirm && confirm !== '';
+        const isValid = validation.isValid && passwordsMatch;
+        
+        if (setupButton) {
+            setupButton.disabled = !isValid;
+        }
+    }
+
+    /**
+     * Toggle password visibility
+     */
+    togglePasswordVisibility(inputId, buttonId) {
+        const input = document.getElementById(inputId);
+        const button = document.getElementById(buttonId);
+        
+        if (!input || !button) return;
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            button.textContent = '🙈';
+            button.setAttribute('aria-label', 'Hide password');
+        } else {
+            input.type = 'password';
+            button.textContent = '👁️';
+            button.setAttribute('aria-label', 'Show password');
+        }
+    }
+
+    /**
+     * Handle password setup completion
+     */
+    async handlePasswordSetup() {
+        try {
+            this.setButtonLoading('setup_password_button', true);
+            
+            const passwordInput = document.getElementById('wallet_password_input');
+            const password = passwordInput ? passwordInput.value : '';
+            
+            // Validate password one more time
+            const validation = wallet.validatePasswordStrength(password);
+            if (!validation.isValid) {
+                throw new Error('Password does not meet security requirements');
+            }
+            
+            // Store the password
+            await wallet.storePassword(password);
+            
+            // Complete wallet creation
+            await this.completeWalletCreation();
+            
+        } catch (error) {
+            console.error('Failed to setup password:', error);
+            this.showError('Failed to setup password: ' + error.message);
+        } finally {
+            this.setButtonLoading('setup_password_button', false);
+        }
+    }
+
+    /**
+     * Complete wallet creation after password setup
+     */
+    async completeWalletCreation() {
+        try {
+            if (!this.pendingCredentials) {
+                throw new Error('No credentials available for wallet creation');
+            }
+
+            await wallet.storeCredentials(this.pendingCredentials);
+            this.pendingCredentials = null;
+            
+            this.showWalletScreen();
+            await this.handleRefresh();
+        } catch (error) {
+            console.error('Failed to complete wallet creation:', error);
+            this.showError('Failed to create wallet');
+            throw error;
+        }
+    }
+
+    /**
+     * Handle import seed validation before password setup
+     */
+    async handleImportSeedValidation() {
+        try {
+            this.setButtonLoading('import_seed_ok_button', true);
+            
+            const textarea = document.getElementById('seed_textarea');
+            const seedText = textarea.value.trim();
+            
+            if (!seedText) {
+                throw new Error('Please enter your seed phrase');
+            }
+
+            // Validate seed phrase
+            const credentials = wallet.createCredentialsFromMnemonic(seedText);
+            this.pendingCredentials = credentials;
+            
+            // Show password setup
+            this.showPasswordSetup();
+            
+        } catch (error) {
+            console.error('Failed to validate seed:', error);
+            this.showError('Failed to validate seed phrase: ' + error.message);
+        } finally {
+            this.setButtonLoading('import_seed_ok_button', false);
+        }
+    }
+
+    /**
+     * Handle import private key validation before password setup
+     */
+    async handleImportKeyValidation() {
+        try {
+            this.setButtonLoading('import_key_ok_button', true);
+            
+            const textarea = document.getElementById('private_key_textarea');
+            const keyText = textarea.value.trim();
+            
+            if (!keyText) {
+                throw new Error('Please enter your private key');
+            }
+
+            // Validate private key
+            const credentials = wallet.createCredentialsFromPrivateKey(keyText);
+            this.pendingCredentials = credentials;
+            
+            // Show password setup
+            this.showPasswordSetup();
+            
+        } catch (error) {
+            console.error('Failed to validate private key:', error);
+            this.showError('Failed to validate private key: ' + error.message);
+        } finally {
+            this.setButtonLoading('import_key_ok_button', false);
+        }
+    }
+
+    /**
+     * Enhanced authentication with better error handling
+     */
+    async handleAuthentication() {
+        const passwordInput = document.getElementById('main_password_input');
+        const password = passwordInput ? passwordInput.value : '';
+
+        if (password.length < 4) {
+            this.showErrorModal('Password must be at least 4 characters long.');
+            return;
+        }
+
+        try {
+            this.setButtonLoading('confirm_auth_button', true);
+            
+            const isValid = await wallet.verifyPassword(password);
+            
+            if (isValid) {
+                this.hideModal('auth_modal');
+                this.showSensitiveData();
+            } else {
+                this.showErrorModal('Incorrect password. Please try again.');
+                if (passwordInput) {
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            this.showErrorModal('Authentication failed. Please try again.');
+        } finally {
+            this.setButtonLoading('confirm_auth_button', false);
+        }
+    }
+
+    /**
+     * Setup biometric authentication option
+     */
+    async setupBiometricOption() {
+        try {
+            const biometricSection = document.getElementById('biometric_setup_section');
+            const biometricButton = document.getElementById('enable_biometric_button');
+            
+            if (!biometricSection || !biometricButton) return;
+
+            const isAvailable = await wallet.isBiometricAvailable();
+            
+            if (isAvailable) {
+                biometricSection.style.display = 'block';
+                biometricButton.disabled = false;
+            } else {
+                biometricSection.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Failed to setup biometric option:', error);
+        }
+    }
+
+    /**
+     * Handle biometric authentication setup
+     */
+    async handleBiometricSetup() {
+        try {
+            const biometricButton = document.getElementById('enable_biometric_button');
+            
+            if (biometricButton) {
+                biometricButton.disabled = true;
+                biometricButton.textContent = 'Setting up...';
+            }
+
+            const success = await wallet.setupBiometric();
+            
+            if (success) {
+                if (biometricButton) {
+                    biometricButton.textContent = '✓ Biometric Enabled';
+                    biometricButton.style.background = '#4caf50';
+                }
+                
+                this.showErrorModal('Biometric authentication enabled successfully! You can now use biometrics to access sensitive information.', 'Success');
+            } else {
+                throw new Error('Failed to setup biometric authentication');
+            }
+        } catch (error) {
+            console.error('Failed to setup biometric:', error);
+            this.showErrorModal('Failed to setup biometric authentication: ' + error.message);
+            
+            const biometricButton = document.getElementById('enable_biometric_button');
+            if (biometricButton) {
+                biometricButton.disabled = false;
+                biometricButton.textContent = 'Enable Biometric Authentication';
+            }
+        }
+    }
+
+    /**
+     * Enhanced authentication with biometric support
+     */
+    async requestSeedPhrase() {
+        this.currentSensitiveAction = 'seed_phrase';
+        
+        // Check if biometric is enabled
+        const biometricEnabled = await wallet.isBiometricEnabled();
+        
+        if (biometricEnabled) {
+            try {
+                const biometricSuccess = await wallet.verifyBiometric();
+                if (biometricSuccess) {
+                    this.hideModal('settings_modal');
+                    this.showSensitiveData();
+                    return;
+                }
+            } catch (error) {
+                console.log('Biometric authentication failed, falling back to password');
+            }
+        }
+        
+        this.showAuthModal('Seed Phrase Access', 'Enter your password to view the seed phrase');
+    }
+
+    /**
+     * Enhanced private key access with biometric support
+     */
+    async requestPrivateKey() {
+        this.currentSensitiveAction = 'private_key';
+        
+        // Check if biometric is enabled
+        const biometricEnabled = await wallet.isBiometricEnabled();
+        
+        if (biometricEnabled) {
+            try {
+                const biometricSuccess = await wallet.verifyBiometric();
+                if (biometricSuccess) {
+                    this.hideModal('settings_modal');
+                    this.showSensitiveData();
+                    return;
+                }
+            } catch (error) {
+                console.log('Biometric authentication failed, falling back to password');
+            }
+        }
+        
+        this.showAuthModal('Private Key Access', 'Enter your password to view the private key');
+    }
+
+    /**
+     * Setup wallet unlock functionality
+     */
+    setupWalletUnlock() {
+        const unlockInput = document.getElementById('unlock_password_input');
+        const unlockButton = document.getElementById('unlock_wallet_button');
+        const logoutButton = document.getElementById('logout_from_lock_button');
+        const toggleUnlock = document.getElementById('toggle_unlock_visibility');
+
+        if (unlockInput) {
+            unlockInput.addEventListener('input', () => {
+                const password = unlockInput.value;
+                if (unlockButton) {
+                    unlockButton.disabled = password.length < 4;
+                }
+            });
+
+            unlockInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && unlockButton && !unlockButton.disabled) {
+                    unlockButton.click();
+                }
+            });
+        }
+
+        if (unlockButton) {
+            unlockButton.addEventListener('click', () => this.handleWalletUnlock());
+        }
+
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => this.handleLogout());
+        }
+
+        if (toggleUnlock) {
+            toggleUnlock.addEventListener('click', () => this.togglePasswordVisibility('unlock_password_input', 'toggle_unlock_visibility'));
+        }
+    }
+
+    /**
+     * Setup activity tracking for auto-lock
+     */
+    setupActivityTracking() {
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+        
+        events.forEach(event => {
+            document.addEventListener(event, () => {
+                if (wallet && wallet.credentials && !wallet.isWalletLocked()) {
+                    wallet.updateActivity();
+                }
+            }, true);
+        });
+    }
+
+    /**
+     * Handle wallet lock
+     */
+    handleWalletLock() {
+        this.currentScreen = 'wallet_lock_screen';
+        this.hideAllScreens();
+        document.getElementById('wallet_lock_screen').classList.add('active');
+        
+        // Clear and focus unlock input
+        const unlockInput = document.getElementById('unlock_password_input');
+        if (unlockInput) {
+            unlockInput.value = '';
+            setTimeout(() => unlockInput.focus(), 100);
+        }
+    }
+
+    /**
+     * Handle wallet unlock
+     */
+    async handleWalletUnlock() {
+        try {
+            this.setButtonLoading('unlock_wallet_button', true);
+            
+            const unlockInput = document.getElementById('unlock_password_input');
+            const password = unlockInput ? unlockInput.value : '';
+            
+            if (password.length < 4) {
+                throw new Error('Password must be at least 4 characters long');
+            }
+
+            const success = await wallet.unlockWallet(password);
+            
+            if (success) {
+                // Return to wallet screen
+                this.showWalletScreen();
+                await this.handleRefresh();
+            } else {
+                throw new Error('Failed to unlock wallet');
+            }
+            
+        } catch (error) {
+            console.error('Failed to unlock wallet:', error);
+            this.showError('Failed to unlock wallet: ' + error.message);
+            
+            // Clear password input
+            const unlockInput = document.getElementById('unlock_password_input');
+            if (unlockInput) {
+                unlockInput.value = '';
+                unlockInput.focus();
+            }
+        } finally {
+            this.setButtonLoading('unlock_wallet_button', false);
         }
     }
 }

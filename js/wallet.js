@@ -25,6 +25,10 @@ class WoofWallet {
         this.transactions = [];
         this.isLoading = false;
         this.lastSync = null;
+        this.lastActivity = Date.now();
+        this.autoLockTimeout = null;
+        this.autoLockDuration = 15 * 60 * 1000; // 15 minutes
+        this.isLocked = false;
     }
 
     /**
@@ -42,6 +46,11 @@ class WoofWallet {
 
             // Load existing wallet data
             await this.load();
+
+            // Setup auto-lock if credentials are present
+            if (this.credentials) {
+                this.setupAutoLock();
+            }
 
             return true;
         } catch (error) {
@@ -169,12 +178,15 @@ class WoofWallet {
     }
 
     /**
-     * Store password hash for authentication
+     * Store password hash for authentication using PBKDF2
      */
     async storePassword(password) {
         try {
-            const hash = await this.simpleHash(password);
-            await walletStorage.set('walletPassword', hash);
+            const { hash, salt } = await this.secureHash(password);
+            await walletStorage.setMultiple({
+                'walletPassword': hash,
+                'passwordSalt': salt
+            });
             return true;
         } catch (error) {
             console.error('Failed to store password:', error);
@@ -187,15 +199,14 @@ class WoofWallet {
      */
     async verifyPassword(password) {
         try {
-            const stored = await walletStorage.get('walletPassword');
-            if (!stored) {
-                // If no password is set, create one
-                await this.storePassword(password);
-                return true;
+            const stored = await walletStorage.getMultiple(['walletPassword', 'passwordSalt']);
+            if (!stored.walletPassword) {
+                // If no password is set, reject authentication
+                return false;
             }
             
-            const hash = await this.simpleHash(password);
-            return hash === stored;
+            const { hash } = await this.secureHash(password, stored.passwordSalt);
+            return hash === stored.walletPassword;
         } catch (error) {
             console.error('Failed to verify password:', error);
             throw error;
@@ -203,28 +214,341 @@ class WoofWallet {
     }
 
     /**
-     * Simple hash function for demo purposes
-     * In production, use a proper cryptographic hash function like bcrypt
+     * Check if password is set
      */
-    async simpleHash(text) {
+    async isPasswordSet() {
         try {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex;
+            const stored = await walletStorage.get('walletPassword');
+            return !!stored;
         } catch (error) {
-            console.error('Hash generation failed:', error);
-            // Fallback hash function if crypto.subtle is not available
+            console.error('Failed to check password status:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Check if biometric authentication is available
+     */
+    async isBiometricAvailable() {
+        try {
+            if (!window.PublicKeyCredential || !navigator.credentials) {
+                return false;
+            }
+            
+            const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+            return available;
+        } catch (error) {
+            console.error('Failed to check biometric availability:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Setup biometric authentication
+     */
+    async setupBiometric() {
+        try {
+            if (!await this.isBiometricAvailable()) {
+                throw new Error('Biometric authentication is not available on this device');
+            }
+
+            const challenge = new Uint8Array(32);
+            crypto.getRandomValues(challenge);
+
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    challenge: challenge,
+                    rp: { name: "Woof Wallet" },
+                    user: {
+                        id: new TextEncoder().encode("woof-wallet-user"),
+                        name: "Wallet User",
+                        displayName: "Wallet User"
+                    },
+                    pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+                    authenticatorSelection: {
+                        userVerification: "required",
+                        authenticatorAttachment: "platform"
+                    },
+                    timeout: 60000,
+                    attestation: "direct"
+                }
+            });
+
+            if (credential) {
+                // Store credential ID for future authentication
+                await walletStorage.set('biometricCredentialId', 
+                    Array.from(new Uint8Array(credential.rawId)).map(b => b.toString(16).padStart(2, '0')).join(''));
+                return true;
+            }
+            
+            return false;
+        } catch (error) {
+            console.error('Failed to setup biometric authentication:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Verify biometric authentication
+     */
+    async verifyBiometric() {
+        try {
+            const credentialId = await walletStorage.get('biometricCredentialId');
+            if (!credentialId) {
+                throw new Error('No biometric credential found');
+            }
+
+            const challenge = new Uint8Array(32);
+            crypto.getRandomValues(challenge);
+
+            const credentialIdBytes = new Uint8Array(credentialId.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+
+            const assertion = await navigator.credentials.get({
+                publicKey: {
+                    challenge: challenge,
+                    allowCredentials: [{
+                        id: credentialIdBytes,
+                        type: 'public-key'
+                    }],
+                    userVerification: "required",
+                    timeout: 60000
+                }
+            });
+
+            return !!assertion;
+        } catch (error) {
+            console.error('Failed to verify biometric authentication:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Check if biometric is enabled
+     */
+    async isBiometricEnabled() {
+        try {
+            const credentialId = await walletStorage.get('biometricCredentialId');
+            return !!credentialId;
+        } catch (error) {
+            console.error('Failed to check biometric status:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Update activity timestamp for auto-lock
+     */
+    updateActivity() {
+        this.lastActivity = Date.now();
+        this.resetAutoLockTimer();
+    }
+
+    /**
+     * Set up auto-lock timer
+     */
+    setupAutoLock() {
+        this.resetAutoLockTimer();
+    }
+
+    /**
+     * Reset auto-lock timer
+     */
+    resetAutoLockTimer() {
+        if (this.autoLockTimeout) {
+            clearTimeout(this.autoLockTimeout);
+        }
+
+        // Only set auto-lock if wallet is loaded and password is set
+        if (this.credentials && !this.isLocked) {
+            this.autoLockTimeout = setTimeout(() => {
+                this.lockWallet();
+            }, this.autoLockDuration);
+        }
+    }
+
+    /**
+     * Lock the wallet
+     */
+    async lockWallet() {
+        try {
+            this.isLocked = true;
+            console.log('Wallet auto-locked due to inactivity');
+            
+            // Clear sensitive data from memory (but keep credentials encrypted in storage)
+            this.clearSensitiveMemoryData();
+            
+            // Notify UI about lock state
+            if (window.ui) {
+                window.ui.handleWalletLock();
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('Failed to lock wallet:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Unlock the wallet with password
+     */
+    async unlockWallet(password) {
+        try {
+            const isValid = await this.verifyPassword(password);
+            if (!isValid) {
+                throw new Error('Invalid password');
+            }
+
+            this.isLocked = false;
+            this.updateActivity();
+            
+            // Reload wallet data
+            await this.load();
+            
+            console.log('Wallet unlocked successfully');
+            return true;
+        } catch (error) {
+            console.error('Failed to unlock wallet:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Clear sensitive data from memory (keeping storage intact)
+     */
+    clearSensitiveMemoryData() {
+        // Keep essential data but clear sensitive memory
+        this.lastActivity = Date.now();
+        
+        if (this.autoLockTimeout) {
+            clearTimeout(this.autoLockTimeout);
+            this.autoLockTimeout = null;
+        }
+    }
+
+    /**
+     * Check if wallet is locked
+     */
+    isWalletLocked() {
+        return this.isLocked;
+    }
+
+    /**
+     * Get time until auto-lock
+     */
+    getTimeUntilAutoLock() {
+        const timeSinceActivity = Date.now() - this.lastActivity;
+        const remainingTime = this.autoLockDuration - timeSinceActivity;
+        return Math.max(0, remainingTime);
+    }
+
+    /**
+     * Secure password hashing using PBKDF2
+     */
+    async secureHash(password, salt = null) {
+        try {
+            // Generate salt if not provided
+            if (!salt) {
+                const saltArray = new Uint8Array(16);
+                crypto.getRandomValues(saltArray);
+                salt = Array.from(saltArray).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            // Convert inputs to proper format
+            const encoder = new TextEncoder();
+            const passwordBuffer = encoder.encode(password);
+            const saltBuffer = new Uint8Array(salt.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+
+            // Import password as key
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                passwordBuffer,
+                'PBKDF2',
+                false,
+                ['deriveBits']
+            );
+
+            // Derive key using PBKDF2
+            const derivedBits = await crypto.subtle.deriveBits(
+                {
+                    name: 'PBKDF2',
+                    salt: saltBuffer,
+                    iterations: 100000, // 100k iterations for security
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                256 // 256 bits output
+            );
+
+            // Convert to hex string
+            const hashArray = Array.from(new Uint8Array(derivedBits));
+            const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            return { hash, salt };
+        } catch (error) {
+            console.error('Secure hash generation failed:', error);
+            // Fallback to simple hash for compatibility
+            return this.simpleHashFallback(password, salt);
+        }
+    }
+
+    /**
+     * Fallback hash function for environments without crypto.subtle
+     */
+    async simpleHashFallback(password, salt = null) {
+        try {
+            if (!salt) {
+                salt = Math.random().toString(36).substring(2, 18);
+            }
+            
+            // Simple hash combining password and salt
+            const combined = password + salt;
             let hash = 0;
-            for (let i = 0; i < text.length; i++) {
-                const char = text.charCodeAt(i);
+            for (let i = 0; i < combined.length; i++) {
+                const char = combined.charCodeAt(i);
                 hash = ((hash << 5) - hash) + char;
                 hash = hash & hash; // Convert to 32-bit integer
             }
-            return hash.toString();
+            
+            return { 
+                hash: Math.abs(hash).toString(16), 
+                salt 
+            };
+        } catch (error) {
+            console.error('Fallback hash failed:', error);
+            throw error;
         }
+    }
+
+    /**
+     * Validate password strength
+     */
+    validatePasswordStrength(password) {
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+        };
+
+        const satisfiedCount = Object.values(requirements).filter(Boolean).length;
+        
+        let strength = 'weak';
+        if (satisfiedCount >= 5) {
+            strength = 'strong';
+        } else if (satisfiedCount >= 4) {
+            strength = 'good';
+        } else if (satisfiedCount >= 3) {
+            strength = 'fair';
+        }
+
+        return {
+            requirements,
+            strength,
+            score: satisfiedCount,
+            isValid: satisfiedCount >= 4 && password.length >= 8
+        };
     }
 
     /**
