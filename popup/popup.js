@@ -297,37 +297,104 @@ function showReceivePage() {
     const address = model.credentials.privateKey.toAddress().toString()
     $("#receive_address_display").innerHTML = address
 
-    // Generate and display QR code
+    // Generate and display QR code with enhanced error handling
     try {
         const qrCode = createQRCode(address)
         const canvas = document.createElement('canvas')
-        renderQRToCanvas(qrCode, canvas, 160)
+        renderQRToCanvas(qrCode, canvas, 180) // Increased size for better scanning
         
         const qrContainer = $("#qr_code_container")
         qrContainer.innerHTML = ""
         qrContainer.appendChild(canvas)
+        
+        // Update aria-label with success message
+        qrContainer.setAttribute('aria-label', `QR code containing wallet address: ${address}`)
+        
+        // Hide fallback
+        $("#qr_fallback").style.display = "none"
     } catch (error) {
         console.error("Error generating QR code:", error)
-        // Fallback: show address as text in QR container
+        
+        // Show fallback message
         const qrContainer = $("#qr_code_container")
-        qrContainer.innerHTML = `
-            <div style="padding: 20px; text-align: center; font-size: 10px; word-break: break-all; background: #f0f0f0; border-radius: 5px;">
-                <div style="margin-bottom: 10px; font-weight: bold;">QR Code unavailable</div>
-                <div>${address}</div>
-            </div>
-        `
+        qrContainer.innerHTML = ""
+        qrContainer.setAttribute('aria-label', 'QR code generation failed. Use the address above instead.')
+        
+        const qrFallback = $("#qr_fallback")
+        qrFallback.style.display = "block"
     }
 
-    $("#copy_receive_address_button").onclick = () => {
-        navigator.clipboard.writeText(address)
-        const originalText = $("#copy_receive_address_button").innerHTML
-        $("#copy_receive_address_button").innerHTML = "Copied!"
-        setTimeout(() => {
-            $("#copy_receive_address_button").innerHTML = originalText
-        }, 2000)
+    // Enhanced copy functionality with better accessibility
+    $("#copy_receive_address_button").onclick = async () => {
+        try {
+            await navigator.clipboard.writeText(address)
+            
+            // Visual feedback
+            const button = $("#copy_receive_address_button")
+            const originalHTML = button.innerHTML
+            button.innerHTML = '<span class="button_icon" aria-hidden="true">✓</span>Copied!'
+            button.setAttribute('aria-label', 'Address copied to clipboard')
+            
+            // Announce to screen readers
+            announceToScreenReader('Address copied to clipboard')
+            
+            setTimeout(() => {
+                button.innerHTML = originalHTML
+                button.setAttribute('aria-label', 'Copy wallet address to clipboard')
+            }, 2000)
+        } catch (error) {
+            console.error("Failed to copy address:", error)
+            
+            // Fallback: create temporary text area for copying
+            const textArea = document.createElement('textarea')
+            textArea.value = address
+            document.body.appendChild(textArea)
+            textArea.select()
+            
+            try {
+                document.execCommand('copy')
+                announceToScreenReader('Address copied to clipboard using fallback method')
+            } catch (fallbackError) {
+                announceToScreenReader('Failed to copy address. Please select and copy manually.')
+                console.error("Fallback copy also failed:", fallbackError)
+            }
+            
+            document.body.removeChild(textArea)
+        }
+    }
+
+    // Add keyboard navigation for address display
+    $("#receive_address_display").onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            $("#copy_receive_address_button").click()
+        }
+    }
+
+    // Add keyboard navigation for QR code
+    $("#qr_code_container").onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            announceToScreenReader(`QR code displayed for wallet address: ${address}`)
+        }
     }
 
     $("#receive_back_button").onclick = showViewWalletPage
+}
+
+// Helper function to announce messages to screen readers
+function announceToScreenReader(message) {
+    const announcement = document.createElement('div')
+    announcement.setAttribute('aria-live', 'polite')
+    announcement.setAttribute('aria-atomic', 'true')
+    announcement.className = 'sr-only'
+    announcement.textContent = message
+    
+    document.body.appendChild(announcement)
+    
+    setTimeout(() => {
+        document.body.removeChild(announcement)
+    }, 1000)
 }
 
 
