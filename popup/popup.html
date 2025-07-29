@@ -145,19 +145,43 @@
 
 
         <!-- RECEIVE PAGE -->
-        <div id="receive_page" class="page">
-            <h1>Receive</h1>
+        <div id="receive_page" class="page" role="main" aria-labelledby="receive_title">
+            <h1 id="receive_title">Receive Dogecoin</h1>
             <div class="receive_content">
-                <div class="address_section">
-                    <h2>Your Address</h2>
-                    <div id="receive_address_display"></div>
-                    <button id="copy_receive_address_button">Copy Address</button>
+                <div class="address_section" role="region" aria-labelledby="address_heading">
+                    <h2 id="address_heading">Your Wallet Address</h2>
+                    <p class="instruction_text">Share this address to receive Dogecoin payments</p>
+                    <div id="receive_address_display" 
+                         role="textbox" 
+                         aria-readonly="true" 
+                         aria-label="Wallet address for receiving payments"
+                         tabindex="0"></div>
+                    <button id="copy_receive_address_button" 
+                            class="copy_button"
+                            aria-describedby="copy_help">
+                        <span class="button_icon" aria-hidden="true">📋</span>
+                        Copy Address
+                    </button>
+                    <div id="copy_help" class="sr-only">Copies the wallet address to your clipboard</div>
                 </div>
-                <div class="qr_section">
-                    <h2>QR Code</h2>
-                    <div id="qr_code_container"></div>
+                <div class="qr_section" role="region" aria-labelledby="qr_heading">
+                    <h2 id="qr_heading">QR Code</h2>
+                    <p class="instruction_text">Scan this code with any QR scanner or wallet app</p>
+                    <div id="qr_code_container" 
+                         role="img" 
+                         aria-label="QR code containing wallet address"
+                         tabindex="0"></div>
+                    <div id="qr_fallback" class="qr_fallback" style="display: none;">
+                        <p>QR code could not be generated</p>
+                        <p class="fallback_text">Use the address above instead</p>
+                    </div>
                 </div>
-                <button id="receive_back_button">Back</button>
+                <button id="receive_back_button" 
+                        class="back_button"
+                        aria-label="Go back to wallet overview">
+                    <span class="button_icon" aria-hidden="true">←</span>
+                    Back
+                </button>
             </div>
         </div>
 

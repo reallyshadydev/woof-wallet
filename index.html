@@ -286,6 +286,53 @@
         </div>
     </div>
 
+    <!-- Receive Modal -->
+    <div id="receive_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Receive Dogecoin</h3>
+                <button id="close_receive_modal" class="close-button" aria-label="Close receive modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="receive-modal-content">
+                    <div class="address-section">
+                        <h4>Your Wallet Address</h4>
+                        <p class="instruction-text">Share this address to receive Dogecoin payments</p>
+                        <div class="address-container">
+                            <div id="modal_wallet_address" 
+                                 class="address-display" 
+                                 role="textbox" 
+                                 aria-readonly="true" 
+                                 aria-label="Wallet address for receiving payments"
+                                 tabindex="0">Loading...</div>
+                            <button id="copy_modal_address_button" 
+                                    class="copy-address-btn" 
+                                    aria-describedby="modal_copy_help">
+                                <span class="button-icon" aria-hidden="true">📋</span>
+                                Copy
+                            </button>
+                        </div>
+                        <div id="modal_copy_help" class="sr-only">Copies the wallet address to your clipboard</div>
+                    </div>
+                    <div class="qr-section">
+                        <h4>QR Code</h4>
+                        <p class="instruction-text">Scan this code with any QR scanner or wallet app</p>
+                        <div class="qr-container">
+                            <div id="modal_qr_code" 
+                                 role="img" 
+                                 aria-label="QR code containing wallet address"
+                                 tabindex="0"></div>
+                            <div id="modal_qr_fallback" class="qr-fallback" style="display: none;">
+                                <p>QR code could not be generated</p>
+                                <p class="fallback-text">Use the address above instead</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Error Modal -->
     <div id="error_modal" class="modal">
         <div class="modal-content">
@@ -304,6 +351,7 @@
     <!-- Scripts -->
     <script src="lib/bitcore-lib-doge.js"></script>
     <script src="lib/bitcore-mnemonic.js"></script>
+    <script src="lib/qrcode.min.js"></script>
     <script src="js/api.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/wallet.js"></script>

@@ -359,8 +359,16 @@ input[type=text]:focus {
 
 /* Receive page */
 #receive_page {
-    gap: 10px;
+    gap: 15px;
     padding: 20px;
+    min-height: 500px;
+}
+
+#receive_title {
+    color: #2d9fd9;
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
 .receive_content {
@@ -369,8 +377,9 @@ input[type=text]:focus {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
-    gap: 15px;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 400px;
 }
 
 .address_section, .qr_section {
@@ -378,50 +387,281 @@ input[type=text]:focus {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(160, 209, 140, 0.3);
 }
 
 .address_section h2, .qr_section h2 {
-    font-size: 1.2em;
+    font-size: 1.3em;
     margin: 0;
-    color: #555;
+    color: #2d9fd9;
+    font-weight: bold;
+}
+
+.instruction_text {
+    font-size: 0.9em;
+    color: #666;
+    text-align: center;
+    margin: 0;
+    line-height: 1.4;
 }
 
 #receive_address_display {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #333;
-    padding: 15px;
-    border-radius: 10px;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    padding: 16px;
+    border-radius: 8px;
     border: 2px solid #a0d18c;
-    font-size: 0.8em;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
     word-break: break-all;
     text-align: center;
-    width: 80%;
-    max-width: 250px;
+    width: 100%;
+    max-width: 280px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+#receive_address_display:focus {
+    outline: 3px solid #2d9fd9;
+    outline-offset: 2px;
+    transform: scale(1.02);
 }
 
 #qr_code_container {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px;
-    background-color: white;
-    border-radius: 10px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 12px;
     border: 2px solid #a0d18c;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-height: 180px;
+    min-width: 180px;
+    transition: all 0.2s ease;
+}
+
+#qr_code_container:focus {
+    outline: 3px solid #2d9fd9;
+    outline-offset: 2px;
+    transform: scale(1.05);
 }
 
 #qr_code_container canvas {
-    border-radius: 5px;
+    border-radius: 6px;
+    display: block;
 }
 
-/* Button variations for different actions */
-#copy_receive_address_button, #copy_seed_button {
+.qr_fallback {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    border: 2px dashed #ccc;
+    color: #666;
+}
+
+.qr_fallback p {
+    margin: 5px 0;
+}
+
+.fallback_text {
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+/* Enhanced button styles */
+.copy_button {
+    background: linear-gradient(135deg, #a0d18c 0%, #2d9fd9 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    min-height: 44px; /* Touch target size */
+}
+
+.copy_button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #8bc374 0%, #2589c7 100%);
+}
+
+.copy_button:focus {
+    outline: 3px solid #ffeb3b;
+    outline-offset: 2px;
+}
+
+.copy_button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.back_button {
+    background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+    color: #424242;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    min-height: 44px; /* Touch target size */
+}
+
+.back_button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #d4d4d4 0%, #a8a8a8 100%);
+}
+
+.back_button:focus {
+    outline: 3px solid #ffeb3b;
+    outline-offset: 2px;
+}
+
+.button_icon {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Responsive design */
+@media (max-width: 320px) {
+    #receive_page {
+        padding: 15px;
+    }
+    
+    .receive_content {
+        gap: 15px;
+        min-height: 350px;
+    }
+    
+    .address_section, .qr_section {
+        padding: 12px;
+        gap: 10px;
+    }
+    
+    #receive_address_display {
+        font-size: 0.8em;
+        padding: 14px;
+        max-width: 250px;
+    }
+    
+    #qr_code_container {
+        min-height: 160px;
+        min-width: 160px;
+        padding: 12px;
+    }
+    
+    .copy_button, .back_button {
+        padding: 10px 20px;
+        font-size: 0.95em;
+    }
+}
+
+@media (min-width: 400px) {
+    #receive_page {
+        padding: 25px;
+    }
+    
+    .receive_content {
+        max-width: 350px;
+        margin: 0 auto;
+    }
+    
+    #receive_address_display {
+        max-width: 300px;
+        font-size: 0.9em;
+    }
+    
+    #qr_code_container {
+        min-height: 200px;
+        min-width: 200px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    #receive_address_display {
+        background-color: #ffffff;
+        color: #000000;
+        border: 3px solid #000000;
+    }
+    
+    #qr_code_container {
+        border: 3px solid #000000;
+        background-color: #ffffff;
+    }
+    
+    .copy_button {
+        background: #000000;
+        color: #ffffff;
+        border: 2px solid #ffffff;
+    }
+    
+    .back_button {
+        background: #ffffff;
+        color: #000000;
+        border: 2px solid #000000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .copy_button, .back_button, #receive_address_display, #qr_code_container {
+        transition: none;
+    }
+    
+    .copy_button:hover, .back_button:hover {
+        transform: none;
+    }
+    
+    #receive_address_display:focus, #qr_code_container:focus {
+        transform: none;
+    }
+}
+
+/* Button variations for different actions (preserve existing styles) */
+#copy_seed_button {
     background-image: linear-gradient(109.6deg, rgba(161,224,186,1) 1.8%, rgba(254,248,154,1) 50.6%, rgba(255,179,189,1) 100.3%);
     font-size: 0.9em;
     width: 70%;
 }
 
-#cancel_password_button, #seed_back_button, #receive_back_button, #settings_back_button {
+#cancel_password_button, #seed_back_button, #settings_back_button {
     background-image: linear-gradient(109.6deg, rgba(200,200,200,1) 1.8%, rgba(230,230,230,1) 50.6%, rgba(200,200,200,1) 100.3%);
     color: #666;
     font-size: 0.9em;
@@ -440,7 +680,7 @@ input[type=text]:focus {
     color: white;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for other pages */
 @media (max-height: 450px) {
     .receive_content {
         gap: 8px;

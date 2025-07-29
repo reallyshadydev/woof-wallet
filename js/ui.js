@@ -879,13 +879,160 @@ class WalletUI {
     }
 
     /**
-     * Show receive modal (placeholder)
+     * Show receive modal with enhanced functionality
      */
     showReceiveModal() {
-        if (wallet.credentials) {
-            const address = wallet.getAddress();
-            alert(`Your address:\n${address}`);
+        if (!wallet.credentials) {
+            this.showErrorModal('Wallet not loaded. Please wait for the wallet to initialize.');
+            return;
         }
+
+        const address = wallet.getAddress();
+        
+        // Update address display
+        const addressElement = document.getElementById('modal_wallet_address');
+        if (addressElement) {
+            addressElement.textContent = address;
+        }
+
+        // Generate and display QR code
+        this.generateReceiveQRCode(address);
+
+        // Set up copy functionality
+        this.setupReceiveModalCopy(address);
+
+        // Set up keyboard navigation
+        this.setupReceiveModalKeyboard(address);
+
+        // Show the modal
+        this.showModal('receive_modal');
+    }
+
+    /**
+     * Generate QR code for receive modal
+     */
+    generateReceiveQRCode(address) {
+        const qrContainer = document.getElementById('modal_qr_code');
+        const qrFallback = document.getElementById('modal_qr_fallback');
+        
+        if (!qrContainer) return;
+
+        try {
+            const qrCode = createQRCode(address);
+            const canvas = document.createElement('canvas');
+            renderQRToCanvas(qrCode, canvas, 200);
+            
+            qrContainer.innerHTML = '';
+            qrContainer.appendChild(canvas);
+            qrContainer.setAttribute('aria-label', `QR code containing wallet address: ${address}`);
+            
+            if (qrFallback) {
+                qrFallback.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+            
+            qrContainer.innerHTML = '';
+            qrContainer.setAttribute('aria-label', 'QR code generation failed. Use the address above instead.');
+            
+            if (qrFallback) {
+                qrFallback.style.display = 'block';
+            }
+        }
+    }
+
+    /**
+     * Set up copy functionality for receive modal
+     */
+    setupReceiveModalCopy(address) {
+        const copyButton = document.getElementById('copy_modal_address_button');
+        if (!copyButton) return;
+
+        // Remove existing event listeners
+        const newCopyButton = copyButton.cloneNode(true);
+        copyButton.parentNode.replaceChild(newCopyButton, copyButton);
+
+        newCopyButton.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(address);
+                
+                // Visual feedback
+                const originalHTML = newCopyButton.innerHTML;
+                newCopyButton.innerHTML = '<span class="button-icon" aria-hidden="true">✓</span>Copied!';
+                newCopyButton.setAttribute('aria-label', 'Address copied to clipboard');
+                
+                // Announce to screen readers
+                this.announceToScreenReader('Address copied to clipboard');
+                
+                setTimeout(() => {
+                    newCopyButton.innerHTML = originalHTML;
+                    newCopyButton.setAttribute('aria-label', 'Copy wallet address to clipboard');
+                }, 2000);
+            } catch (error) {
+                console.error('Failed to copy address:', error);
+                
+                // Fallback: create temporary text area for copying
+                const textArea = document.createElement('textarea');
+                textArea.value = address;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    this.announceToScreenReader('Address copied to clipboard using fallback method');
+                } catch (fallbackError) {
+                    this.announceToScreenReader('Failed to copy address. Please select and copy manually.');
+                    console.error('Fallback copy also failed:', fallbackError);
+                }
+                
+                document.body.removeChild(textArea);
+            }
+        });
+    }
+
+    /**
+     * Set up keyboard navigation for receive modal
+     */
+    setupReceiveModalKeyboard(address) {
+        const addressDisplay = document.getElementById('modal_wallet_address');
+        const qrContainer = document.getElementById('modal_qr_code');
+
+        if (addressDisplay) {
+            addressDisplay.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    document.getElementById('copy_modal_address_button')?.click();
+                }
+            });
+        }
+
+        if (qrContainer) {
+            qrContainer.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.announceToScreenReader(`QR code displayed for wallet address: ${address}`);
+                }
+            });
+        }
+    }
+
+    /**
+     * Helper function to announce messages to screen readers
+     */
+    announceToScreenReader(message) {
+        const announcement = document.createElement('div');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.setAttribute('aria-atomic', 'true');
+        announcement.className = 'sr-only';
+        announcement.textContent = message;
+        
+        document.body.appendChild(announcement);
+        
+        setTimeout(() => {
+            if (document.body.contains(announcement)) {
+                document.body.removeChild(announcement);
+            }
+        }, 1000);
     }
 }
 
