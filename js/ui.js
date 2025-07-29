@@ -233,17 +233,24 @@ class WalletUI {
     }
 
     /**
+     * Hide all screens
+     */
+    hideAllScreens() {
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(screen => {
+            screen.classList.remove('active');
+            console.log(`❌ Hiding screen: ${screen.id}`);
+        });
+    }
+
+    /**
      * Show a specific screen
      */
     showScreen(screenId) {
         console.log(`🖥️ Switching to screen: ${screenId}`);
         
         // Hide all screens
-        const screens = document.querySelectorAll('.screen');
-        screens.forEach(screen => {
-            screen.classList.remove('active');
-            console.log(`❌ Hiding screen: ${screen.id}`);
-        });
+        this.hideAllScreens();
 
         // Show target screen
         const targetScreen = document.getElementById(screenId);
