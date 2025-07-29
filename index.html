@@ -3,89 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Woof Wallet - Secure Dogecoin and Doginals Web Wallet with advanced accessibility features">
     <title>Woof Wallet - Dogecoin & Doginals Web Wallet</title>
+    
+    <!-- Preload critical resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Theme and accessibility meta tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="color-scheme" content="light dark">
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Skip Navigation Links for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#navigation" class="skip-link">Skip to navigation</a>
+    
+    <!-- Accessibility Indicators -->
+    <div class="contrast-indicator" aria-live="polite">High Contrast Mode Active</div>
+    <div class="motion-indicator" aria-live="polite">Reduced Motion Active</div>
+    
     <!-- Loading Screen -->
-    <div id="loading_screen" class="screen active">
+    <div id="loading_screen" class="screen active" role="main" aria-live="polite">
         <div class="loading-container">
-            <div class="loading-spinner"></div>
-            <h2>Loading Woof Wallet...</h2>
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <h2 id="loading-status">Loading Woof Wallet...</h2>
+            <p class="sr-only">Please wait while the wallet application loads</p>
         </div>
     </div>
 
     <!-- Wallet Lock Screen -->
-    <div id="wallet_lock_screen" class="screen">
+    <div id="wallet_lock_screen" class="screen" role="main">
         <div class="container">
-            <div class="logo">🔒</div>
+            <div class="logo" aria-hidden="true">🔒</div>
             <h1>Wallet Locked</h1>
             <div class="lock-content">
-                <div class="info-box">
+                <div class="info-box" role="alert">
                     <p>Your wallet has been locked for security. Enter your password to unlock and continue using your wallet.</p>
                 </div>
                 
-                <div class="input-group">
-                    <label for="unlock_password_input">Password</label>
-                    <div class="password-input-wrapper">
-                        <input type="password" id="unlock_password_input" placeholder="Enter your password" aria-label="Password to unlock wallet">
-                        <button type="button" id="toggle_unlock_visibility" class="password-toggle" aria-label="Toggle password visibility">👁️</button>
+                <form aria-label="Unlock wallet form">
+                    <div class="input-group">
+                        <label for="unlock_password_input">Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="unlock_password_input" 
+                                placeholder="Enter your password" 
+                                aria-label="Password to unlock wallet"
+                                aria-describedby="unlock-requirements"
+                                required
+                                autocomplete="current-password">
+                            <button 
+                                type="button" 
+                                id="toggle_unlock_visibility" 
+                                class="password-toggle" 
+                                aria-label="Toggle password visibility"
+                                aria-pressed="false">
+                                <span aria-hidden="true">👁️</span>
+                            </button>
+                        </div>
+                        <div id="unlock-requirements" class="sr-only">
+                            Enter the password you set up when creating your wallet
+                        </div>
                     </div>
-                </div>
 
-                <div class="button-group">
-                    <button id="unlock_wallet_button" class="primary-button" disabled>Unlock Wallet</button>
-                    <button id="logout_from_lock_button" class="secondary-button">Logout</button>
-                </div>
+                    <div class="button-group" role="group" aria-label="Wallet unlock actions">
+                        <button id="unlock_wallet_button" class="primary-button" disabled aria-describedby="unlock-status">
+                            Unlock Wallet
+                        </button>
+                        <button id="logout_from_lock_button" class="secondary-button" type="button">
+                            Logout
+                        </button>
+                    </div>
+                </form>
 
-                <div class="security-info">
+                <div class="security-info" role="complementary">
                     <p><small>💡 Your wallet automatically locks after 15 minutes of inactivity for your security.</small></p>
                 </div>
+                
+                <div id="unlock-status" class="sr-only" aria-live="polite"></div>
             </div>
         </div>
     </div>
 
     <!-- Terms Acceptance Screen -->
-    <div id="accept_terms_screen" class="screen">
+    <div id="accept_terms_screen" class="screen" role="main">
         <div class="container">
-            <div class="logo">🐕</div>
+            <div class="logo" aria-hidden="true">🐕</div>
             <h1>Welcome to Woof Wallet</h1>
-            <div class="terms-content">
+            <div class="terms-content" role="complementary">
                 <p>By using Woof Wallet, you acknowledge and agree:</p>
-                <ul>
-                    <li>This is experimental software that may contain bugs</li>
-                    <li>You are responsible for securing your private keys</li>
-                    <li>Funds or NFTs could be lost due to software issues</li>
-                    <li>Only store amounts you can afford to lose</li>
-                    <li>The developers are not liable for any losses</li>
-                    <li>You use this wallet at your own risk</li>
+                <ul role="list">
+                    <li role="listitem">This is experimental software that may contain bugs</li>
+                    <li role="listitem">You are responsible for securing your private keys</li>
+                    <li role="listitem">Funds or NFTs could be lost due to software issues</li>
+                    <li role="listitem">Only store amounts you can afford to lose</li>
+                    <li role="listitem">The developers are not liable for any losses</li>
+                    <li role="listitem">You use this wallet at your own risk</li>
                 </ul>
             </div>
-            <button id="accept_terms_button" class="primary-button">I Understand - Continue</button>
+            <button 
+                id="accept_terms_button" 
+                class="primary-button"
+                aria-describedby="terms-description">
+                I Understand - Continue
+            </button>
+            <div id="terms-description" class="sr-only">
+                By clicking this button, you agree to all terms and conditions listed above
+            </div>
         </div>
     </div>
 
     <!-- Wallet Setup Screen -->
-    <div id="setup_screen" class="screen">
+    <div id="setup_screen" class="screen" role="main">
         <div class="container">
-            <div class="logo">🐕</div>
+            <div class="logo" aria-hidden="true">🐕</div>
             <h1>Set Up Your Wallet</h1>
-            <div class="setup-options">
-                <button id="new_wallet_button" class="setup-option">
-                    <div class="option-icon">🆕</div>
+            <div class="setup-options" role="group" aria-label="Wallet setup options">
+                <button id="new_wallet_button" class="setup-option" aria-describedby="new-wallet-desc">
+                    <div class="option-icon" aria-hidden="true">🆕</div>
                     <div class="option-text">
                         <h3>Create New Wallet</h3>
-                        <p>Generate a new wallet with 12-word seed phrase</p>
+                        <p id="new-wallet-desc">Generate a new wallet with 12-word seed phrase</p>
                     </div>
                 </button>
-                <button id="import_wallet_button" class="setup-option">
-                    <div class="option-icon">📥</div>
+                <button id="import_wallet_button" class="setup-option" aria-describedby="import-wallet-desc">
+                    <div class="option-icon" aria-hidden="true">📥</div>
                     <div class="option-text">
                         <h3>Import Existing Wallet</h3>
-                        <p>Import from seed phrase or private key</p>
+                        <p id="import-wallet-desc">Import from seed phrase or private key</p>
                     </div>
                 </button>
             </div>
@@ -236,120 +286,218 @@
     </div>
 
     <!-- Main Wallet Screen -->
-    <div id="wallet_screen" class="screen">
-        <div class="wallet-header">
+    <div id="wallet_screen" class="screen" role="main">
+        <header class="wallet-header" role="banner">
             <div class="wallet-info">
                 <div class="balance-section">
                     <div class="balance-label">Total Balance</div>
-                    <div id="doge_balance" class="balance-amount">Loading...</div>
+                    <div id="doge_balance" class="balance-amount" role="text" aria-live="polite">Loading...</div>
                 </div>
                 <div class="address-section">
                     <div class="address-label">Your Address</div>
                     <div class="address-container">
-                        <span id="wallet_address" class="address">Loading...</span>
-                        <button id="copy_address_button" class="copy-button" title="Copy Address">📋</button>
+                        <span id="wallet_address" class="address" role="text" aria-live="polite" aria-label="Wallet address">Loading...</span>
+                        <button 
+                            id="copy_address_button" 
+                            class="copy-button" 
+                            title="Copy Address" 
+                            aria-label="Copy wallet address to clipboard">
+                            <span aria-hidden="true">📋</span>
+                        </button>
                     </div>
                 </div>
             </div>
             <div class="wallet-actions">
-                <button id="main_settings_button" class="settings-icon-button" title="Settings" aria-label="Open settings menu">⚙️</button>
+                <button 
+                    id="main_settings_button" 
+                    class="settings-icon-button" 
+                    title="Settings" 
+                    aria-label="Open settings menu"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+                    <span aria-hidden="true">⚙️</span>
+                </button>
             </div>
-        </div>
+        </header>
 
-        <div class="wallet-tabs">
-            <button id="tab_overview" class="tab-button active">Overview</button>
-            <button id="tab_doginals" class="tab-button">Doginals</button>
-            <button id="tab_send" class="tab-button">Send</button>
-            <button id="tab_history" class="tab-button">History</button>
-        </div>
+        <nav id="navigation" class="wallet-tabs" role="tablist" aria-label="Wallet navigation">
+            <button 
+                id="tab_overview" 
+                class="tab-button active" 
+                role="tab" 
+                aria-selected="true" 
+                aria-controls="overview_tab"
+                tabindex="0">
+                Overview
+            </button>
+            <button 
+                id="tab_doginals" 
+                class="tab-button" 
+                role="tab" 
+                aria-selected="false" 
+                aria-controls="doginals_tab"
+                tabindex="-1">
+                Doginals
+            </button>
+            <button 
+                id="tab_send" 
+                class="tab-button" 
+                role="tab" 
+                aria-selected="false" 
+                aria-controls="send_tab"
+                tabindex="-1">
+                Send
+            </button>
+            <button 
+                id="tab_history" 
+                class="tab-button" 
+                role="tab" 
+                aria-selected="false" 
+                aria-controls="history_tab"
+                tabindex="-1">
+                History
+            </button>
+        </nav>
 
-        <div class="wallet-content">
+        <main id="main-content" class="wallet-content">
             <!-- Overview Tab -->
-            <div id="overview_tab" class="tab-content active">
-                <div class="overview-stats">
-                    <div class="stat-card">
-                        <div class="stat-label">DOGE Balance</div>
-                        <div id="overview_balance" class="stat-value">0 DOGE</div>
+            <section id="overview_tab" class="tab-content active" role="tabpanel" aria-labelledby="tab_overview">
+                <div class="overview-stats" role="group" aria-label="Wallet statistics">
+                    <div class="stat-card" role="group" aria-labelledby="doge-balance-label">
+                        <div id="doge-balance-label" class="stat-label">DOGE Balance</div>
+                        <div id="overview_balance" class="stat-value" role="text" aria-live="polite">0 DOGE</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Doginals</div>
-                        <div id="overview_doginals_count" class="stat-value">0</div>
+                    <div class="stat-card" role="group" aria-labelledby="doginals-count-label">
+                        <div id="doginals-count-label" class="stat-label">Doginals</div>
+                        <div id="overview_doginals_count" class="stat-value" role="text" aria-live="polite">0</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Pending Txs</div>
-                        <div id="overview_pending" class="stat-value">0</div>
+                    <div class="stat-card" role="group" aria-labelledby="pending-txs-label">
+                        <div id="pending-txs-label" class="stat-label">Pending Txs</div>
+                        <div id="overview_pending" class="stat-value" role="text" aria-live="polite">0</div>
                     </div>
                 </div>
-                <div class="quick-actions">
-                    <button id="quick_send_button" class="action-button">
-                        <span class="action-icon">💸</span>
+                <div class="quick-actions" role="group" aria-label="Quick actions">
+                    <button id="quick_send_button" class="action-button" aria-describedby="send-description">
+                        <span class="action-icon" aria-hidden="true">💸</span>
                         Send DOGE
                     </button>
-                    <button id="quick_receive_button" class="action-button">
-                        <span class="action-icon">📥</span>
+                    <button id="quick_receive_button" class="action-button" aria-describedby="receive-description">
+                        <span class="action-icon" aria-hidden="true">📥</span>
                         Receive
                     </button>
+                    <div id="send-description" class="sr-only">Send Dogecoin to another wallet</div>
+                    <div id="receive-description" class="sr-only">Get your wallet address to receive Dogecoin</div>
                 </div>
-            </div>
+            </section>
 
             <!-- Doginals Tab -->
-            <div id="doginals_tab" class="tab-content">
+            <section id="doginals_tab" class="tab-content" role="tabpanel" aria-labelledby="tab_doginals" aria-hidden="true">
                 <div class="tab-header">
                     <h3>Your Doginals Collection</h3>
-                    <button id="refresh_doginals_button" class="refresh-button">🔄</button>
+                    <button 
+                        id="refresh_doginals_button" 
+                        class="refresh-button"
+                        aria-label="Refresh doginals collection">
+                        <span aria-hidden="true">🔄</span>
+                    </button>
                 </div>
-                <div id="doginals_container" class="doginals-grid">
-                    <div class="loading-message">Loading doginals...</div>
+                <div id="doginals_container" class="doginals-grid" role="grid" aria-label="Doginals collection">
+                    <div class="loading-message" aria-live="polite">Loading doginals...</div>
                 </div>
-            </div>
+            </section>
 
             <!-- Send Tab -->
-            <div id="send_tab" class="tab-content">
-                <div class="send-form">
+            <section id="send_tab" class="tab-content" role="tabpanel" aria-labelledby="tab_send" aria-hidden="true">
+                <form class="send-form" aria-label="Send Dogecoin form">
                     <h3>Send Dogecoin</h3>
                     <div class="form-group">
                         <label for="send_address">Recipient Address</label>
-                        <input type="text" id="send_address" placeholder="Enter Dogecoin address..." />
+                        <input 
+                            type="text" 
+                            id="send_address" 
+                            placeholder="Enter Dogecoin address..." 
+                            aria-describedby="address-help"
+                            required
+                            pattern="[DN][A-Za-z0-9]{33}"
+                            title="Enter a valid Dogecoin address starting with D or N" />
+                        <div id="address-help" class="sr-only">
+                            Enter the Dogecoin address where you want to send coins
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="send_amount">Amount (DOGE)</label>
-                        <input type="number" id="send_amount" placeholder="0.00" step="0.01" min="0.01" />
-                        <div class="balance-info">
+                        <input 
+                            type="number" 
+                            id="send_amount" 
+                            placeholder="0.00" 
+                            step="0.01" 
+                            min="0.01" 
+                            aria-describedby="amount-help available-balance"
+                            required />
+                        <div class="balance-info" id="available-balance">
                             Available: <span id="available_balance">0 DOGE</span>
+                        </div>
+                        <div id="amount-help" class="sr-only">
+                            Enter the amount of Dogecoin to send
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="send_fee">Network Fee (DOGE)</label>
-                        <input type="number" id="send_fee" value="1.0" step="0.1" min="0.1" />
+                        <input 
+                            type="number" 
+                            id="send_fee" 
+                            value="1.0" 
+                            step="0.1" 
+                            min="0.1" 
+                            aria-describedby="fee-help"
+                            required />
+                        <div id="fee-help" class="sr-only">
+                            Network fee for processing the transaction
+                        </div>
                     </div>
-                    <div class="safety-check">
-                        <div class="safety-info">
-                            <span class="safety-icon">🛡️</span>
+                    <div class="safety-check" role="region" aria-labelledby="safety-heading">
+                        <div class="safety-info" id="safety-heading">
+                            <span class="safety-icon" aria-hidden="true">🛡️</span>
                             <span>Safe Send: Will not spend UTXOs containing doginals</span>
                         </div>
                     </div>
-                    <button id="send_doge_button" class="primary-button">Send DOGE</button>
-                </div>
-            </div>
+                    <button 
+                        id="send_doge_button" 
+                        class="primary-button" 
+                        type="submit"
+                        aria-describedby="send-warning">
+                        Send DOGE
+                    </button>
+                    <div id="send-warning" class="sr-only">
+                        Review all details before sending. Transactions cannot be reversed.
+                    </div>
+                </form>
+            </section>
 
             <!-- Transaction History Tab -->
-            <div id="history_tab" class="tab-content">
+            <section id="history_tab" class="tab-content" role="tabpanel" aria-labelledby="tab_history" aria-hidden="true">
                 <div class="tab-header">
                     <h3>Transaction History</h3>
-                    <button id="refresh_history_button" class="refresh-button">🔄</button>
+                    <button 
+                        id="refresh_history_button" 
+                        class="refresh-button"
+                        aria-label="Refresh transaction history">
+                        <span aria-hidden="true">🔄</span>
+                    </button>
                 </div>
                 <div class="history-filters">
-                    <select id="history_filter">
+                    <label for="history_filter" class="sr-only">Filter transactions</label>
+                    <select id="history_filter" aria-label="Filter transaction history">
                         <option value="all">All Transactions</option>
                         <option value="sent">Sent</option>
                         <option value="received">Received</option>
                     </select>
                 </div>
-                <div id="history_container" class="history-list">
+                <div id="history_container" class="history-list" role="log" aria-live="polite" aria-label="Transaction history">
                     <div class="loading-message">Loading transaction history...</div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
     <!-- Doginal Detail Modal -->

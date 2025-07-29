@@ -1,6 +1,6 @@
 /**
  * UI Controller for Woof Wallet
- * Handles all user interface interactions and updates
+ * Enhanced with accessibility, touch support, and responsive design
  */
 
 class WalletUI {
@@ -9,94 +9,538 @@ class WalletUI {
         this.currentTab = 'overview';
         this.isLoading = false;
         this.selectedInscription = null;
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.lastActivity = Date.now();
+        this.accessibilityMode = false;
+        this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        this.highContrast = window.matchMedia('(prefers-contrast: high)').matches;
     }
 
     /**
-     * Initialize the UI
+     * Initialize the UI with enhanced accessibility and touch support
      */
     init() {
         this.setupEventListeners();
+        this.setupAccessibilityFeatures();
+        this.setupTouchSupport();
+        this.setupKeyboardNavigation();
         this.showLoadingScreen();
+        this.announceToScreenReader('Woof Wallet is loading');
     }
 
     /**
-     * Set up all event listeners
+     * Set up accessibility features
+     */
+    setupAccessibilityFeatures() {
+        // Monitor accessibility preferences
+        window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+            this.reducedMotion = e.matches;
+            document.body.classList.toggle('reduced-motion', e.matches);
+        });
+
+        window.matchMedia('(prefers-contrast: high)').addEventListener('change', (e) => {
+            this.highContrast = e.matches;
+            document.body.classList.toggle('high-contrast', e.matches);
+        });
+
+        // Add focus trap for modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeActiveModal();
+            }
+        });
+
+        // Announce dynamic content changes
+        this.setupLiveRegions();
+    }
+
+    /**
+     * Set up touch support for mobile devices
+     */
+    setupTouchSupport() {
+        // Touch events for tab swiping
+        const tabContainer = document.querySelector('.wallet-tabs');
+        if (tabContainer) {
+            tabContainer.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+            tabContainer.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+            tabContainer.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+        }
+
+        // Add haptic feedback for supported devices
+        this.setupHapticFeedback();
+
+        // Optimize touch targets
+        this.optimizeTouchTargets();
+    }
+
+    /**
+     * Handle touch start events
+     */
+    handleTouchStart(e) {
+        this.touchStartX = e.touches[0].clientX;
+        this.touchStartY = e.touches[0].clientY;
+    }
+
+    /**
+     * Handle touch move events
+     */
+    handleTouchMove(e) {
+        if (!this.touchStartX || !this.touchStartY) {
+            return;
+        }
+
+        const touchEndX = e.touches[0].clientX;
+        const touchEndY = e.touches[0].clientY;
+        const diffX = this.touchStartX - touchEndX;
+        const diffY = this.touchStartY - touchEndY;
+
+        // Prevent vertical scrolling if horizontal swipe is detected
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            e.preventDefault();
+        }
+    }
+
+    /**
+     * Handle touch end events for tab swiping
+     */
+    handleTouchEnd(e) {
+        if (!this.touchStartX || !this.touchStartY) {
+            return;
+        }
+
+        const touchEndX = e.changedTouches[0].clientX;
+        const diffX = this.touchStartX - touchEndX;
+
+        // Minimum swipe distance
+        if (Math.abs(diffX) > 100) {
+            if (diffX > 0) {
+                this.switchToNextTab();
+            } else {
+                this.switchToPreviousTab();
+            }
+        }
+
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+    }
+
+    /**
+     * Set up keyboard navigation
+     */
+    setupKeyboardNavigation() {
+        // Tab navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target.classList.contains('tab-button')) {
+                this.handleTabKeyNavigation(e);
+            }
+        });
+
+        // General keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case '1':
+                        e.preventDefault();
+                        this.switchToTab('overview');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        this.switchToTab('doginals');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        this.switchToTab('send');
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        this.switchToTab('history');
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        this.refreshCurrentTab();
+                        break;
+                }
+            }
+        });
+    }
+
+    /**
+     * Handle keyboard navigation for tabs
+     */
+    handleTabKeyNavigation(e) {
+        const tabs = Array.from(document.querySelectorAll('.tab-button'));
+        const currentIndex = tabs.findIndex(tab => tab === e.target);
+
+        switch (e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                const prevIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
+                tabs[prevIndex].focus();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                const nextIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
+                tabs[nextIndex].focus();
+                break;
+            case 'Home':
+                e.preventDefault();
+                tabs[0].focus();
+                break;
+            case 'End':
+                e.preventDefault();
+                tabs[tabs.length - 1].focus();
+                break;
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                e.target.click();
+                break;
+        }
+    }
+
+    /**
+     * Set up haptic feedback for touch interactions
+     */
+    setupHapticFeedback() {
+        if ('vibrate' in navigator) {
+            // Add haptic feedback to buttons
+            document.addEventListener('touchstart', (e) => {
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                    navigator.vibrate(10); // Short vibration
+                }
+            });
+        }
+    }
+
+    /**
+     * Optimize touch targets for mobile accessibility
+     */
+    optimizeTouchTargets() {
+        const smallTargets = document.querySelectorAll('button, a, input, select');
+        smallTargets.forEach(target => {
+            const rect = target.getBoundingClientRect();
+            if (rect.width < 44 || rect.height < 44) {
+                target.style.minWidth = '44px';
+                target.style.minHeight = '44px';
+                target.style.display = 'inline-flex';
+                target.style.alignItems = 'center';
+                target.style.justifyContent = 'center';
+            }
+        });
+    }
+
+    /**
+     * Set up live regions for screen reader announcements
+     */
+    setupLiveRegions() {
+        // Create announcement region if it doesn't exist
+        if (!document.getElementById('announcements')) {
+            const announcements = document.createElement('div');
+            announcements.id = 'announcements';
+            announcements.className = 'sr-only';
+            announcements.setAttribute('aria-live', 'polite');
+            announcements.setAttribute('aria-atomic', 'true');
+            document.body.appendChild(announcements);
+        }
+    }
+
+    /**
+     * Announce messages to screen readers
+     */
+    announceToScreenReader(message) {
+        const announcements = document.getElementById('announcements');
+        if (announcements) {
+            announcements.textContent = message;
+            setTimeout(() => {
+                announcements.textContent = '';
+            }, 1000);
+        }
+    }
+
+    /**
+     * Switch to next tab
+     */
+    switchToNextTab() {
+        const tabs = ['overview', 'doginals', 'send', 'history'];
+        const currentIndex = tabs.indexOf(this.currentTab);
+        const nextIndex = (currentIndex + 1) % tabs.length;
+        this.switchToTab(tabs[nextIndex]);
+    }
+
+    /**
+     * Switch to previous tab
+     */
+    switchToPreviousTab() {
+        const tabs = ['overview', 'doginals', 'send', 'history'];
+        const currentIndex = tabs.indexOf(this.currentTab);
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
+        this.switchToTab(tabs[prevIndex]);
+    }
+
+    /**
+     * Enhanced tab switching with accessibility support
+     */
+    switchToTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            const isActive = btn.id === `tab_${tabName}`;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive);
+            btn.setAttribute('tabindex', isActive ? '0' : '-1');
+        });
+
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            const isActive = content.id === `${tabName}_tab`;
+            content.classList.toggle('active', isActive);
+            content.setAttribute('aria-hidden', !isActive);
+        });
+
+        this.currentTab = tabName;
+        this.announceToScreenReader(`Switched to ${tabName} tab`);
+        
+        // Add visual feedback
+        this.addVisualFeedback(`tab_${tabName}`);
+    }
+
+    /**
+     * Refresh current tab content
+     */
+    refreshCurrentTab() {
+        switch (this.currentTab) {
+            case 'doginals':
+                document.getElementById('refresh_doginals_button')?.click();
+                break;
+            case 'history':
+                document.getElementById('refresh_history_button')?.click();
+                break;
+            default:
+                // Refresh balance and overview
+                if (window.walletManager) {
+                    window.walletManager.updateBalance();
+                }
+        }
+        this.announceToScreenReader(`${this.currentTab} tab refreshed`);
+    }
+
+    /**
+     * Add visual feedback to UI interactions
+     */
+    addVisualFeedback(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element || this.reducedMotion) return;
+
+        element.classList.add('feedback-flash');
+        setTimeout(() => {
+            element.classList.remove('feedback-flash');
+        }, 150);
+    }
+
+    /**
+     * Show loading state with accessibility support
+     */
+    showLoadingState(element, message = 'Loading...') {
+        if (!element) return;
+
+        element.classList.add('loading-state');
+        element.setAttribute('aria-busy', 'true');
+        
+        // Update screen reader
+        const statusElement = element.querySelector('[role="status"]') || element;
+        const originalText = statusElement.textContent;
+        statusElement.textContent = message;
+
+        return () => {
+            element.classList.remove('loading-state');
+            element.setAttribute('aria-busy', 'false');
+            statusElement.textContent = originalText;
+        };
+    }
+
+    /**
+     * Enhanced button feedback with accessibility
+     */
+    addButtonFeedback(button, type = 'success') {
+        if (!button) return;
+
+        const originalText = button.textContent;
+        const feedback = {
+            success: { text: '✓ Success', class: 'btn-success' },
+            error: { text: '✗ Error', class: 'btn-error' },
+            loading: { text: '⌛ Loading...', class: 'btn-loading' }
+        };
+
+        if (feedback[type]) {
+            button.textContent = feedback[type].text;
+            button.classList.add(feedback[type].class);
+            button.setAttribute('aria-live', 'polite');
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove(feedback[type].class);
+                button.removeAttribute('aria-live');
+            }, 2000);
+        }
+    }
+
+    /**
+     * Close active modal with accessibility support
+     */
+    closeActiveModal() {
+        const activeModal = document.querySelector('.modal.active');
+        if (activeModal) {
+            activeModal.classList.remove('active');
+            activeModal.setAttribute('aria-hidden', 'true');
+            
+            // Return focus to trigger element
+            const triggerId = activeModal.dataset.triggeredBy;
+            if (triggerId) {
+                const triggerElement = document.getElementById(triggerId);
+                if (triggerElement) {
+                    triggerElement.focus();
+                }
+            }
+            
+            this.announceToScreenReader('Modal closed');
+        }
+    }
+
+    /**
+     * Enhanced copy functionality with feedback
+     */
+    async copyToClipboard(text, button) {
+        try {
+            await navigator.clipboard.writeText(text);
+            this.addButtonFeedback(button, 'success');
+            this.announceToScreenReader('Copied to clipboard');
+            
+            // Haptic feedback
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+            }
+        } catch (err) {
+            this.addButtonFeedback(button, 'error');
+            this.announceToScreenReader('Failed to copy');
+            console.error('Failed to copy text: ', err);
+        }
+    }
+
+    /**
+     * Set up all event listeners with enhanced functionality
      */
     setupEventListeners() {
         // Terms acceptance
         const acceptTermsBtn = document.getElementById('accept_terms_button');
         if (acceptTermsBtn) {
-            acceptTermsBtn.addEventListener('click', () => this.handleAcceptTerms());
+            acceptTermsBtn.addEventListener('click', () => {
+                this.addVisualFeedback('accept_terms_button');
+                this.handleAcceptTerms();
+            });
         }
 
-        // Wallet setup
+        // Wallet setup with enhanced feedback
         const newWalletBtn = document.getElementById('new_wallet_button');
         const importWalletBtn = document.getElementById('import_wallet_button');
         
         if (newWalletBtn) {
-            newWalletBtn.addEventListener('click', () => this.showCreateScreen());
+            newWalletBtn.addEventListener('click', () => {
+                this.addVisualFeedback('new_wallet_button');
+                this.showCreateScreen();
+            });
         }
         
         if (importWalletBtn) {
-            importWalletBtn.addEventListener('click', () => this.showImportOptionsScreen());
+            importWalletBtn.addEventListener('click', () => {
+                this.addVisualFeedback('import_wallet_button');
+                this.showImportOptionsScreen();
+            });
         }
 
-        // Create wallet
-        const createOkBtn = document.getElementById('create_wallet_ok_button');
-        if (createOkBtn) {
-            createOkBtn.addEventListener('click', () => this.showPasswordSetup());
+        // Enhanced tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tabName = e.target.id.replace('tab_', '');
+                this.switchToTab(tabName);
+            });
+        });
+
+        // Copy button with enhanced feedback
+        const copyAddressBtn = document.getElementById('copy_address_button');
+        if (copyAddressBtn) {
+            copyAddressBtn.addEventListener('click', () => {
+                const address = document.getElementById('wallet_address').textContent;
+                this.copyToClipboard(address, copyAddressBtn);
+            });
         }
 
-        // Import options
-        const importSeedBtn = document.getElementById('import_seed_button');
-        const importKeyBtn = document.getElementById('import_private_key_button');
-        
-        if (importSeedBtn) {
-            importSeedBtn.addEventListener('click', () => this.showImportSeedScreen());
-        }
-        
-        if (importKeyBtn) {
-            importKeyBtn.addEventListener('click', () => this.showImportKeyScreen());
-        }
+        // Enhanced form validation
+        this.setupFormValidation();
 
-        // Import actions
-        const importSeedOkBtn = document.getElementById('import_seed_ok_button');
-        const importKeyOkBtn = document.getElementById('import_key_ok_button');
-        
-        if (importSeedOkBtn) {
-            importSeedOkBtn.addEventListener('click', () => this.handleImportSeedValidation());
-        }
-        
-        if (importKeyOkBtn) {
-            importKeyOkBtn.addEventListener('click', () => this.handleImportKeyValidation());
-        }
-
-        // Back buttons
+        // Set up remaining event listeners...
         this.setupBackButtons();
-
-        // Wallet tabs
-        this.setupWalletTabs();
-
-        // Wallet actions
         this.setupWalletActions();
-
-        // Modals
         this.setupModals();
-
-        // Settings
         this.setupSettings();
-
-        // Copy buttons
-        this.setupCopyButtons();
-
-        // Password setup
         this.setupPasswordSetup();
-
-        // Wallet unlock
         this.setupWalletUnlock();
-
-        // Activity tracking for auto-lock
         this.setupActivityTracking();
+    }
+
+    /**
+     * Enhanced form validation with accessibility
+     */
+    setupFormValidation() {
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            const inputs = form.querySelectorAll('input[required]');
+            inputs.forEach(input => {
+                input.addEventListener('blur', () => this.validateInput(input));
+                input.addEventListener('input', () => this.clearValidationError(input));
+            });
+        });
+    }
+
+    /**
+     * Validate individual input with accessibility feedback
+     */
+    validateInput(input) {
+        const isValid = input.checkValidity();
+        const errorId = `${input.id}-error`;
+        let errorElement = document.getElementById(errorId);
+
+        if (!isValid) {
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.id = errorId;
+                errorElement.className = 'input-error';
+                errorElement.setAttribute('role', 'alert');
+                input.parentNode.appendChild(errorElement);
+            }
+            
+            errorElement.textContent = input.validationMessage;
+            input.setAttribute('aria-describedby', errorId);
+            input.classList.add('invalid');
+        } else {
+            this.clearValidationError(input);
+        }
+
+        return isValid;
+    }
+
+    /**
+     * Clear validation error
+     */
+    clearValidationError(input) {
+        const errorId = `${input.id}-error`;
+        const errorElement = document.getElementById(errorId);
+        
+        if (errorElement) {
+            errorElement.remove();
+        }
+        
+        input.removeAttribute('aria-describedby');
+        input.classList.remove('invalid');
     }
 
     /**
