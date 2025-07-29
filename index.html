@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woof Wallet - Dogecoin & Doginals Web Wallet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading_screen" class="screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <h2>Loading Woof Wallet...</h2>
+        </div>
+    </div>
+
+    <!-- Terms Acceptance Screen -->
+    <div id="accept_terms_screen" class="screen">
+        <div class="container">
+            <div class="logo">🐕</div>
+            <h1>Welcome to Woof Wallet</h1>
+            <div class="terms-content">
+                <p>By using Woof Wallet, you acknowledge and agree:</p>
+                <ul>
+                    <li>This is experimental software that may contain bugs</li>
+                    <li>You are responsible for securing your private keys</li>
+                    <li>Funds or NFTs could be lost due to software issues</li>
+                    <li>Only store amounts you can afford to lose</li>
+                    <li>The developers are not liable for any losses</li>
+                    <li>You use this wallet at your own risk</li>
+                </ul>
+            </div>
+            <button id="accept_terms_button" class="primary-button">I Understand - Continue</button>
+        </div>
+    </div>
+
+    <!-- Wallet Setup Screen -->
+    <div id="setup_screen" class="screen">
+        <div class="container">
+            <div class="logo">🐕</div>
+            <h1>Set Up Your Wallet</h1>
+            <div class="setup-options">
+                <button id="new_wallet_button" class="setup-option">
+                    <div class="option-icon">🆕</div>
+                    <div class="option-text">
+                        <h3>Create New Wallet</h3>
+                        <p>Generate a new wallet with 12-word seed phrase</p>
+                    </div>
+                </button>
+                <button id="import_wallet_button" class="setup-option">
+                    <div class="option-icon">📥</div>
+                    <div class="option-text">
+                        <h3>Import Existing Wallet</h3>
+                        <p>Import from seed phrase or private key</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Wallet Screen -->
+    <div id="create_screen" class="screen">
+        <div class="container">
+            <h1>Your Recovery Phrase</h1>
+            <div class="warning-box">
+                <p><strong>⚠️ Important:</strong> Write down these 12 words in order and store them securely. This is the only way to recover your wallet!</p>
+            </div>
+            <div id="mnemonic_display" class="mnemonic-grid"></div>
+            <button id="create_wallet_ok_button" class="primary-button">I've Written It Down</button>
+        </div>
+    </div>
+
+    <!-- Import Options Screen -->
+    <div id="import_options_screen" class="screen">
+        <div class="container">
+            <h1>Import Method</h1>
+            <div class="import-options">
+                <button id="import_seed_button" class="setup-option">
+                    <div class="option-icon">🔤</div>
+                    <div class="option-text">
+                        <h3>12-Word Seed Phrase</h3>
+                        <p>Import using your recovery phrase</p>
+                    </div>
+                </button>
+                <button id="import_private_key_button" class="setup-option">
+                    <div class="option-icon">🔑</div>
+                    <div class="option-text">
+                        <h3>Private Key</h3>
+                        <p>Import using WIF private key</p>
+                    </div>
+                </button>
+            </div>
+            <button id="back_to_setup_button" class="secondary-button">Back</button>
+        </div>
+    </div>
+
+    <!-- Import Seed Screen -->
+    <div id="import_seed_screen" class="screen">
+        <div class="container">
+            <h1>Enter Your Seed Phrase</h1>
+            <div class="seed-input-container">
+                <textarea id="seed_textarea" placeholder="Enter your 12-word recovery phrase here..." rows="4"></textarea>
+            </div>
+            <button id="import_seed_ok_button" class="primary-button">Import Wallet</button>
+            <button id="back_to_import_options_button" class="secondary-button">Back</button>
+        </div>
+    </div>
+
+    <!-- Import Private Key Screen -->
+    <div id="import_key_screen" class="screen">
+        <div class="container">
+            <h1>Enter Private Key</h1>
+            <div class="key-input-container">
+                <textarea id="private_key_textarea" placeholder="Enter your WIF private key here..." rows="3"></textarea>
+            </div>
+            <button id="import_key_ok_button" class="primary-button">Import Wallet</button>
+            <button id="back_to_import_options_button2" class="secondary-button">Back</button>
+        </div>
+    </div>
+
+    <!-- Main Wallet Screen -->
+    <div id="wallet_screen" class="screen">
+        <div class="wallet-header">
+            <div class="wallet-info">
+                <div class="balance-section">
+                    <div class="balance-label">Total Balance</div>
+                    <div id="doge_balance" class="balance-amount">Loading...</div>
+                </div>
+                <div class="address-section">
+                    <div class="address-label">Your Address</div>
+                    <div class="address-container">
+                        <span id="wallet_address" class="address">Loading...</span>
+                        <button id="copy_address_button" class="copy-button" title="Copy Address">📋</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wallet-tabs">
+            <button id="tab_overview" class="tab-button active">Overview</button>
+            <button id="tab_doginals" class="tab-button">Doginals</button>
+            <button id="tab_send" class="tab-button">Send</button>
+            <button id="tab_history" class="tab-button">History</button>
+        </div>
+
+        <div class="wallet-content">
+            <!-- Overview Tab -->
+            <div id="overview_tab" class="tab-content active">
+                <div class="overview-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">DOGE Balance</div>
+                        <div id="overview_balance" class="stat-value">0 DOGE</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Doginals</div>
+                        <div id="overview_doginals_count" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pending Txs</div>
+                        <div id="overview_pending" class="stat-value">0</div>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button id="quick_send_button" class="action-button">
+                        <span class="action-icon">💸</span>
+                        Send DOGE
+                    </button>
+                    <button id="quick_receive_button" class="action-button">
+                        <span class="action-icon">📥</span>
+                        Receive
+                    </button>
+                </div>
+            </div>
+
+            <!-- Doginals Tab -->
+            <div id="doginals_tab" class="tab-content">
+                <div class="tab-header">
+                    <h3>Your Doginals Collection</h3>
+                    <button id="refresh_doginals_button" class="refresh-button">🔄</button>
+                </div>
+                <div id="doginals_container" class="doginals-grid">
+                    <div class="loading-message">Loading doginals...</div>
+                </div>
+            </div>
+
+            <!-- Send Tab -->
+            <div id="send_tab" class="tab-content">
+                <div class="send-form">
+                    <h3>Send Dogecoin</h3>
+                    <div class="form-group">
+                        <label for="send_address">Recipient Address</label>
+                        <input type="text" id="send_address" placeholder="Enter Dogecoin address..." />
+                    </div>
+                    <div class="form-group">
+                        <label for="send_amount">Amount (DOGE)</label>
+                        <input type="number" id="send_amount" placeholder="0.00" step="0.01" min="0.01" />
+                        <div class="balance-info">
+                            Available: <span id="available_balance">0 DOGE</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="send_fee">Network Fee (DOGE)</label>
+                        <input type="number" id="send_fee" value="1.0" step="0.1" min="0.1" />
+                    </div>
+                    <div class="safety-check">
+                        <div class="safety-info">
+                            <span class="safety-icon">🛡️</span>
+                            <span>Safe Send: Will not spend UTXOs containing doginals</span>
+                        </div>
+                    </div>
+                    <button id="send_doge_button" class="primary-button">Send DOGE</button>
+                </div>
+            </div>
+
+            <!-- Transaction History Tab -->
+            <div id="history_tab" class="tab-content">
+                <div class="tab-header">
+                    <h3>Transaction History</h3>
+                    <button id="refresh_history_button" class="refresh-button">🔄</button>
+                </div>
+                <div class="history-filters">
+                    <select id="history_filter">
+                        <option value="all">All Transactions</option>
+                        <option value="sent">Sent</option>
+                        <option value="received">Received</option>
+                    </select>
+                </div>
+                <div id="history_container" class="history-list">
+                    <div class="loading-message">Loading transaction history...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doginal Detail Modal -->
+    <div id="doginal_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="doginal_title">Doginal Details</h3>
+                <button id="close_doginal_modal" class="close-button">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="doginal_content_display" class="doginal-content"></div>
+                <div class="doginal-info">
+                    <div class="info-row">
+                        <span class="info-label">Inscription:</span>
+                        <span id="doginal_inscription_id" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Number:</span>
+                        <span id="doginal_number" class="info-value"></span>
+                    </div>
+                </div>
+                <div class="send-doginal-section">
+                    <h4>Send This Doginal</h4>
+                    <input type="text" id="doginal_send_address" placeholder="Enter recipient address..." />
+                    <button id="send_doginal_button" class="primary-button">Send Doginal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Success Modal -->
+    <div id="success_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Transaction Sent!</h3>
+                <button id="close_success_modal" class="close-button">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="success-icon">✅</div>
+                <p>Your transaction has been broadcast to the network.</p>
+                <div class="txid-container">
+                    <label>Transaction ID:</label>
+                    <div class="txid-display">
+                        <span id="success_txid"></span>
+                        <button id="copy_txid_button" class="copy-button">📋</button>
+                    </div>
+                </div>
+                <button id="view_explorer_button" class="secondary-button">View in Explorer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Error</h3>
+                <button id="close_error_modal" class="close-button">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="error-icon">❌</div>
+                <p id="error_message">An error occurred</p>
+                <button id="close_error_button" class="primary-button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="lib/bitcore-lib-doge.js"></script>
+    <script src="lib/bitcore-mnemonic.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/wallet.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
