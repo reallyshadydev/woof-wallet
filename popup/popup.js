@@ -215,6 +215,7 @@ function showSettingsPage() {
     showPage("settings_page")
 
     $("#show_seed_phrase_button").onclick = showPasswordPromptPage
+    $("#show_private_key_button").onclick = showPasswordPromptForPrivateKey
     $("#logout_button").onclick = async () => {
         if (confirm("Are you sure you want to logout? You'll need your seed phrase or private key to restore access.")) {
             await model.logout()
@@ -288,6 +289,72 @@ function showSeedPhrasePage() {
     }
 
     $("#seed_back_button").onclick = showSettingsPage
+}
+
+
+function showPasswordPromptForPrivateKey() {
+    showPage("password_prompt_page")
+    
+    $("#password_input").value = ""
+    $("#password_input").focus()
+    $("#confirm_password_button").disabled = true
+
+    $("#password_input").oninput = () => {
+        const password = $("#password_input").value
+        $("#confirm_password_button").disabled = password.length < 4
+    }
+
+    $("#confirm_password_button").onclick = async () => {
+        const password = $("#password_input").value
+        
+        try {
+            const isValid = await model.verifyPassword(password)
+            if (isValid) {
+                showPrivateKeyPage()
+            } else {
+                alert("Incorrect password. Please try again.")
+                $("#password_input").value = ""
+                $("#password_input").focus()
+            }
+        } catch (error) {
+            alert("Error verifying password. Please try again.")
+            console.error(error)
+        }
+    }
+
+    $("#cancel_password_button").onclick = showSettingsPage
+
+    // Allow Enter key to submit
+    $("#password_input").onkeypress = (e) => {
+        if (e.key === 'Enter' && !$("#confirm_password_button").disabled) {
+            $("#confirm_password_button").click()
+        }
+    }
+}
+
+
+function showPrivateKeyPage() {
+    showPage("show_private_key_page")
+
+    const privateKey = model.credentials.privateKey
+    if (privateKey) {
+        $("#private_key_display").innerHTML = privateKey.toWIF()
+    } else {
+        $("#private_key_display").innerHTML = "No private key available"
+    }
+
+    $("#copy_private_key_button").onclick = () => {
+        if (privateKey) {
+            navigator.clipboard.writeText(privateKey.toWIF())
+            const originalText = $("#copy_private_key_button").innerHTML
+            $("#copy_private_key_button").innerHTML = "Copied!"
+            setTimeout(() => {
+                $("#copy_private_key_button").innerHTML = originalText
+            }, 2000)
+        }
+    }
+
+    $("#private_key_back_button").onclick = showSettingsPage
 }
 
 
