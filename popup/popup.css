@@ -249,3 +249,216 @@ input[type=text]:focus {
      border: 1px solid #a0d18c;
      color: #2d9fd9;
 }
+
+/* Settings button in header */
+#settings_button {
+    border-radius: 0px;
+    background-size: contain;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>');
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 20px;
+    height: 20px;
+    padding: 0px;
+    margin: 0px;
+    margin-right: 10px;
+}
+
+/* Receive button styling */
+#receive_button {
+    width: 60%;
+    margin: 10px auto;
+    font-size: 1em;
+}
+
+/* Settings page */
+.settings_content {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.settings_option {
+    width: 80%;
+    margin-bottom: 15px;
+}
+
+/* Password prompt page */
+#password_prompt_page {
+    gap: 15px;
+    padding: 20px;
+}
+
+.security_message {
+    text-align: center;
+    color: #555;
+    font-size: 0.95em;
+    margin: 10px 20px;
+}
+
+#password_input {
+    width: 80%;
+    border-radius: 20px;
+    border: 1px solid #2d9fd9;
+    color: #a0d18c;
+    height: 30px;
+    padding-left: 10px;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+#password_input:focus {
+    outline: none;
+    border: 1px solid #a0d18c;
+    color: #2d9fd9;
+}
+
+/* Seed phrase page */
+#show_seed_page {
+    gap: 15px;
+    padding: 20px;
+}
+
+.security_warning {
+    background-color: rgba(255, 165, 0, 0.2);
+    border: 2px solid #FFA500;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    text-align: center;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.security_warning p {
+    margin: 5px 0;
+}
+
+#seed_phrase_display {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 10px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    word-spacing: 8px;
+    line-height: 1.5;
+    border: 2px solid #a0d18c;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Receive page */
+#receive_page {
+    gap: 10px;
+    padding: 20px;
+}
+
+.receive_content {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    gap: 15px;
+}
+
+.address_section, .qr_section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.address_section h2, .qr_section h2 {
+    font-size: 1.2em;
+    margin: 0;
+    color: #555;
+}
+
+#receive_address_display {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #a0d18c;
+    font-size: 0.8em;
+    word-break: break-all;
+    text-align: center;
+    width: 80%;
+    max-width: 250px;
+}
+
+#qr_code_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+    border-radius: 10px;
+    border: 2px solid #a0d18c;
+}
+
+#qr_code_container canvas {
+    border-radius: 5px;
+}
+
+/* Button variations for different actions */
+#copy_receive_address_button, #copy_seed_button {
+    background-image: linear-gradient(109.6deg, rgba(161,224,186,1) 1.8%, rgba(254,248,154,1) 50.6%, rgba(255,179,189,1) 100.3%);
+    font-size: 0.9em;
+    width: 70%;
+}
+
+#cancel_password_button, #seed_back_button, #receive_back_button, #settings_back_button {
+    background-image: linear-gradient(109.6deg, rgba(200,200,200,1) 1.8%, rgba(230,230,230,1) 50.6%, rgba(200,200,200,1) 100.3%);
+    color: #666;
+    font-size: 0.9em;
+    width: 60%;
+}
+
+/* Logout button with warning color */
+#logout_button {
+    background-image: linear-gradient(109.6deg, rgba(255,100,100,1) 1.8%, rgba(255,150,150,1) 50.6%, rgba(255,100,100,1) 100.3%);
+    color: white;
+}
+
+/* Show seed phrase button with security emphasis */
+#show_seed_phrase_button {
+    background-image: linear-gradient(109.6deg, rgba(255,165,0,1) 1.8%, rgba(255,200,100,1) 50.6%, rgba(255,165,0,1) 100.3%);
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-height: 450px) {
+    .receive_content {
+        gap: 8px;
+    }
+    
+    #qr_code_container canvas {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    .security_warning {
+        padding: 10px;
+        font-size: 0.8em;
+    }
+    
+    #seed_phrase_display {
+        font-size: 1em;
+        padding: 15px;
+        min-height: 60px;
+    }
+}

@@ -95,13 +95,69 @@
                 <div class="header_row">
                     <div id="address"></div>
                     <button id="copy_address_button" title="Copy address to clipboard"></button>
+                    <button id="settings_button" title="Settings"></button>
                 </div>
                 <div class="header_row">
                     <span id="doge_balance">Loading...</span>
                 </div>
+                <div class="header_row">
+                    <button id="receive_button">Receive</button>
+                </div>
             </div>
             <div id="doginals">
                 Loading...
+            </div>
+        </div>
+
+
+        <!-- SETTINGS MENU -->
+        <div id="settings_page" class="page">
+            <h1>Settings</h1>
+            <div class="settings_content">
+                <button id="show_seed_phrase_button" class="settings_option">Show Seed Phrase</button>
+                <button id="logout_button" class="settings_option">Logout</button>
+                <button id="settings_back_button" class="settings_option">Back</button>
+            </div>
+        </div>
+
+
+        <!-- PASSWORD PROMPT FOR SEED PHRASE -->
+        <div id="password_prompt_page" class="page">
+            <h1>Enter Password</h1>
+            <p class="security_message">Please enter your password to view the seed phrase</p>
+            <input id="password_input" type="password" placeholder="Enter password">
+            <button id="confirm_password_button">Confirm</button>
+            <button id="cancel_password_button">Cancel</button>
+        </div>
+
+
+        <!-- SHOW SEED PHRASE -->
+        <div id="show_seed_page" class="page">
+            <h1>Seed Phrase</h1>
+            <div class="security_warning">
+                <p>⚠️ Never share your seed phrase with anyone!</p>
+                <p>Keep it safe and secure.</p>
+            </div>
+            <div id="seed_phrase_display"></div>
+            <button id="copy_seed_button">Copy to Clipboard</button>
+            <button id="seed_back_button">Back</button>
+        </div>
+
+
+        <!-- RECEIVE PAGE -->
+        <div id="receive_page" class="page">
+            <h1>Receive</h1>
+            <div class="receive_content">
+                <div class="address_section">
+                    <h2>Your Address</h2>
+                    <div id="receive_address_display"></div>
+                    <button id="copy_receive_address_button">Copy Address</button>
+                </div>
+                <div class="qr_section">
+                    <h2>QR Code</h2>
+                    <div id="qr_code_container"></div>
+                </div>
+                <button id="receive_back_button">Back</button>
             </div>
         </div>
 
@@ -132,6 +188,7 @@
     <script src="lib/bitcore-lib-doge.js"></script>
     <script src="lib/bitcore-mnemonic.js"></script>
     <script src="lib/browser-polyfill.min.js"></script>
+    <script src="lib/qrcode.min.js"></script>
 
     <script src="model.js"></script>
     <script src="popup.js"></script>

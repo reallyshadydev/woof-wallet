@@ -129,6 +129,8 @@ function showViewWalletPage() {
     const address = model.credentials.privateKey.toAddress().toString()
 
     $("#copy_address_button").onclick = () => navigator.clipboard.writeText(address)
+    $("#settings_button").onclick = showSettingsPage
+    $("#receive_button").onclick = showReceivePage
 
     $("#address").innerHTML = address
 
@@ -206,6 +208,126 @@ function showViewWalletPage() {
             }
         })
     })
+}
+
+
+function showSettingsPage() {
+    showPage("settings_page")
+
+    $("#show_seed_phrase_button").onclick = showPasswordPromptPage
+    $("#logout_button").onclick = async () => {
+        if (confirm("Are you sure you want to logout? You'll need your seed phrase or private key to restore access.")) {
+            await model.logout()
+            reloadWallet()
+        }
+    }
+    $("#settings_back_button").onclick = showViewWalletPage
+}
+
+
+function showPasswordPromptPage() {
+    showPage("password_prompt_page")
+    
+    $("#password_input").value = ""
+    $("#password_input").focus()
+    $("#confirm_password_button").disabled = true
+
+    $("#password_input").oninput = () => {
+        const password = $("#password_input").value
+        $("#confirm_password_button").disabled = password.length < 4
+    }
+
+    $("#confirm_password_button").onclick = async () => {
+        const password = $("#password_input").value
+        
+        try {
+            const isValid = await model.verifyPassword(password)
+            if (isValid) {
+                showSeedPhrasePage()
+            } else {
+                alert("Incorrect password. Please try again.")
+                $("#password_input").value = ""
+                $("#password_input").focus()
+            }
+        } catch (error) {
+            alert("Error verifying password. Please try again.")
+            console.error(error)
+        }
+    }
+
+    $("#cancel_password_button").onclick = showSettingsPage
+
+    // Allow Enter key to submit
+    $("#password_input").onkeypress = (e) => {
+        if (e.key === 'Enter' && !$("#confirm_password_button").disabled) {
+            $("#confirm_password_button").click()
+        }
+    }
+}
+
+
+function showSeedPhrasePage() {
+    showPage("show_seed_page")
+
+    const mnemonic = model.credentials.mnemonic
+    if (mnemonic) {
+        $("#seed_phrase_display").innerHTML = mnemonic.toString()
+    } else {
+        $("#seed_phrase_display").innerHTML = "No seed phrase available (wallet created from private key)"
+    }
+
+    $("#copy_seed_button").onclick = () => {
+        if (mnemonic) {
+            navigator.clipboard.writeText(mnemonic.toString())
+            const originalText = $("#copy_seed_button").innerHTML
+            $("#copy_seed_button").innerHTML = "Copied!"
+            setTimeout(() => {
+                $("#copy_seed_button").innerHTML = originalText
+            }, 2000)
+        }
+    }
+
+    $("#seed_back_button").onclick = showSettingsPage
+}
+
+
+function showReceivePage() {
+    showPage("receive_page")
+
+    const address = model.credentials.privateKey.toAddress().toString()
+    $("#receive_address_display").innerHTML = address
+
+    // Generate and display QR code
+    try {
+        const qrCode = createQRCode(address)
+        const canvas = document.createElement('canvas')
+        renderQRToCanvas(qrCode, canvas, 160)
+        
+        const qrContainer = $("#qr_code_container")
+        qrContainer.innerHTML = ""
+        qrContainer.appendChild(canvas)
+    } catch (error) {
+        console.error("Error generating QR code:", error)
+        // Fallback: show address as text in QR container
+        const qrContainer = $("#qr_code_container")
+        qrContainer.innerHTML = `
+            <div style="padding: 20px; text-align: center; font-size: 10px; word-break: break-all; background: #f0f0f0; border-radius: 5px;">
+                <div style="margin-bottom: 10px; font-weight: bold;">QR Code unavailable</div>
+                <div>${address}</div>
+            </div>
+        `
+    }
+
+    $("#copy_receive_address_button").onclick = () => {
+        navigator.clipboard.writeText(address)
+        const originalText = $("#copy_receive_address_button").innerHTML
+        $("#copy_receive_address_button").innerHTML = "Copied!"
+        setTimeout(() => {
+            $("#copy_receive_address_button").innerHTML = originalText
+        }, 2000)
+    }
+
+    $("#receive_back_button").onclick = showViewWalletPage
 }
 
 
