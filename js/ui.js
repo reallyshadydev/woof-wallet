@@ -224,10 +224,13 @@ class WalletUI {
      * Show a specific screen
      */
     showScreen(screenId) {
+        console.log(`🖥️ Switching to screen: ${screenId}`);
+        
         // Hide all screens
         const screens = document.querySelectorAll('.screen');
         screens.forEach(screen => {
             screen.classList.remove('active');
+            console.log(`❌ Hiding screen: ${screen.id}`);
         });
 
         // Show target screen
@@ -235,6 +238,9 @@ class WalletUI {
         if (targetScreen) {
             targetScreen.classList.add('active');
             this.currentScreen = screenId;
+            console.log(`✅ Showing screen: ${screenId}`);
+        } else {
+            console.error(`❌ Screen not found: ${screenId}`);
         }
     }
 
@@ -305,6 +311,15 @@ class WalletUI {
         this.showScreen('wallet_screen');
         this.updateWalletDisplay();
         this.switchTab('overview');
+        
+        // Extra safety check to ensure loading screen is hidden
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading_screen');
+            if (loadingScreen && loadingScreen.classList.contains('active')) {
+                console.warn('⚠️ Loading screen still active after wallet screen shown - force hiding');
+                loadingScreen.classList.remove('active');
+            }
+        }, 100);
     }
 
     /**

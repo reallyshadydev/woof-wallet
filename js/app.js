@@ -16,6 +16,19 @@ class WoofWalletApp {
         try {
             console.log('🐕 Initializing Woof Wallet...');
             
+            // Set up fail-safe to hide loading screen after maximum 10 seconds
+            const loadingFailSafe = setTimeout(() => {
+                console.warn('⚠️ Loading screen fail-safe triggered - hiding loading screen');
+                const loadingScreen = document.getElementById('loading_screen');
+                if (loadingScreen && loadingScreen.classList.contains('active')) {
+                    loadingScreen.classList.remove('active');
+                    // Show error or try to determine initial screen again
+                    if (!this.initialized) {
+                        this.handleInitializationError(new Error('Initialization timed out'));
+                    }
+                }
+            }, 10000);
+            
             // Initialize UI first
             ui.init();
             
@@ -24,6 +37,9 @@ class WoofWalletApp {
             
             // Determine initial screen based on wallet state
             await this.determineInitialScreen();
+            
+            // Clear the fail-safe timer since initialization completed
+            clearTimeout(loadingFailSafe);
             
             this.initialized = true;
             console.log('🐕 Woof Wallet initialized successfully!');
@@ -40,25 +56,35 @@ class WoofWalletApp {
      */
     async determineInitialScreen() {
         try {
+            console.log('🔍 Determining initial screen...');
+            console.log('Terms accepted:', wallet.acceptedTerms);
+            console.log('Wallet credentials exist:', !!wallet.credentials);
+            
             // Check if terms are accepted
             if (!wallet.acceptedTerms) {
+                console.log('➡️ Showing terms screen');
                 ui.showTermsScreen();
                 return;
             }
 
             // Check if wallet exists
             if (!wallet.credentials) {
+                console.log('➡️ Showing setup screen');
                 ui.showSetupScreen();
                 return;
             }
 
             // Wallet exists, show main wallet screen
+            console.log('➡️ Showing wallet screen');
             ui.showWalletScreen();
+            console.log('✅ Wallet screen should now be visible');
             
             // Refresh wallet data in background
             setTimeout(async () => {
                 try {
+                    console.log('🔄 Starting background wallet refresh...');
                     await ui.handleRefresh();
+                    console.log('✅ Background wallet refresh completed');
                 } catch (error) {
                     console.error('Failed to refresh wallet data on startup:', error);
                 }
