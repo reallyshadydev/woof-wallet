@@ -106,6 +106,53 @@ class Model {
         this.credentials = credentials
     }
 
+    async storePassword(password) {
+        // Store a simple hash of the password for verification
+        // In a real wallet, you'd want to use proper key derivation functions
+        const hash = await this.simpleHash(password);
+        await browser.storage.local.set({ walletPassword: hash });
+    }
+
+    async verifyPassword(password) {
+        const stored = await browser.storage.local.get(['walletPassword']);
+        if (!stored.walletPassword) {
+            // If no password is set, create one
+            await this.storePassword(password);
+            return true;
+        }
+        
+        const hash = await this.simpleHash(password);
+        return hash === stored.walletPassword;
+    }
+
+    async simpleHash(text) {
+        // Simple hash function for demo purposes
+        // In production, use a proper cryptographic hash function
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async logout() {
+        // Clear all sensitive data
+        await browser.storage.local.remove([
+            'privkey', 
+            'mnemonic', 
+            'derivation', 
+            'utxos',
+            'walletPassword'
+        ]);
+        
+        // Reset instance variables
+        this.credentials = null;
+        this.utxos = null;
+        this.inscriptions = null;
+        this.numUnconfirmed = 0;
+        this.dataCache = null;
+    }
+
 
     async refreshUtxos() {
         let utxos = []
