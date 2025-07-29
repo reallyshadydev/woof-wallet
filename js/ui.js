@@ -83,6 +83,9 @@ class WalletUI {
         // Modals
         this.setupModals();
 
+        // Settings
+        this.setupSettings();
+
         // Copy buttons
         this.setupCopyButtons();
     }
@@ -1033,6 +1036,279 @@ class WalletUI {
                 document.body.removeChild(announcement);
             }
         }, 1000);
+    }
+
+    /**
+     * Set up settings functionality
+     */
+    setupSettings() {
+        // Settings button
+        const settingsBtn = document.getElementById('main_settings_button');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => this.showSettingsModal());
+        }
+
+        // Settings modal close buttons
+        const closeSettingsBtn = document.getElementById('close_settings_modal');
+        if (closeSettingsBtn) {
+            closeSettingsBtn.addEventListener('click', () => this.hideModal('settings_modal'));
+        }
+
+        // Settings options
+        const showSeedBtn = document.getElementById('main_show_seed_button');
+        const showPrivateKeyBtn = document.getElementById('main_show_private_key_button');
+        const logoutBtn = document.getElementById('main_logout_button');
+
+        if (showSeedBtn) {
+            showSeedBtn.addEventListener('click', () => this.requestSeedPhrase());
+        }
+
+        if (showPrivateKeyBtn) {
+            showPrivateKeyBtn.addEventListener('click', () => this.requestPrivateKey());
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.handleLogout());
+        }
+
+        // Authentication modal
+        this.setupAuthModal();
+        this.setupSensitiveDataModal();
+    }
+
+    /**
+     * Set up authentication modal
+     */
+    setupAuthModal() {
+        const closeAuthBtn = document.getElementById('close_auth_modal');
+        const confirmAuthBtn = document.getElementById('confirm_auth_button');
+        const cancelAuthBtn = document.getElementById('cancel_auth_button');
+        const passwordInput = document.getElementById('main_password_input');
+
+        if (closeAuthBtn) {
+            closeAuthBtn.addEventListener('click', () => this.hideModal('auth_modal'));
+        }
+
+        if (cancelAuthBtn) {
+            cancelAuthBtn.addEventListener('click', () => this.hideModal('auth_modal'));
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', () => {
+                const password = passwordInput.value;
+                if (confirmAuthBtn) {
+                    confirmAuthBtn.disabled = password.length < 4;
+                }
+            });
+
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && confirmAuthBtn && !confirmAuthBtn.disabled) {
+                    confirmAuthBtn.click();
+                }
+            });
+        }
+
+        if (confirmAuthBtn) {
+            confirmAuthBtn.addEventListener('click', () => this.handleAuthentication());
+        }
+    }
+
+    /**
+     * Set up sensitive data display modal
+     */
+    setupSensitiveDataModal() {
+        const closeBtn = document.getElementById('close_sensitive_modal');
+        const closeDataBtn = document.getElementById('close_sensitive_data_button');
+        const copyBtn = document.getElementById('copy_sensitive_data_button');
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hideModal('sensitive_data_modal'));
+        }
+
+        if (closeDataBtn) {
+            closeDataBtn.addEventListener('click', () => this.hideModal('sensitive_data_modal'));
+        }
+
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => this.copySensitiveData());
+        }
+    }
+
+    /**
+     * Show settings modal
+     */
+    showSettingsModal() {
+        if (!wallet.credentials) {
+            this.showErrorModal('Wallet not loaded. Please wait for the wallet to initialize.');
+            return;
+        }
+
+        this.showModal('settings_modal');
+    }
+
+    /**
+     * Request seed phrase with authentication
+     */
+    requestSeedPhrase() {
+        this.currentSensitiveAction = 'seed_phrase';
+        this.showAuthModal('Seed Phrase Access', 'Enter your password to view the seed phrase');
+    }
+
+    /**
+     * Request private key with authentication
+     */
+    requestPrivateKey() {
+        this.currentSensitiveAction = 'private_key';
+        this.showAuthModal('Private Key Access', 'Enter your password to view the private key');
+    }
+
+    /**
+     * Show authentication modal
+     */
+    showAuthModal(title, message) {
+        const titleElement = document.getElementById('auth_modal_title');
+        const messageElement = document.getElementById('auth_modal_message');
+        const passwordInput = document.getElementById('main_password_input');
+        const confirmBtn = document.getElementById('confirm_auth_button');
+
+        if (titleElement) titleElement.textContent = title;
+        if (messageElement) messageElement.textContent = message;
+        if (passwordInput) {
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+        if (confirmBtn) confirmBtn.disabled = true;
+
+        this.hideModal('settings_modal');
+        this.showModal('auth_modal');
+    }
+
+    /**
+     * Handle authentication
+     */
+    async handleAuthentication() {
+        const passwordInput = document.getElementById('main_password_input');
+        const password = passwordInput ? passwordInput.value : '';
+
+        if (password.length < 4) {
+            this.showErrorModal('Password must be at least 4 characters long.');
+            return;
+        }
+
+        try {
+            const isValid = await wallet.verifyPassword(password);
+            
+            if (isValid) {
+                this.hideModal('auth_modal');
+                this.showSensitiveData();
+            } else {
+                this.showErrorModal('Incorrect password. Please try again.');
+                if (passwordInput) {
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            this.showErrorModal('Authentication failed. Please try again.');
+        }
+    }
+
+    /**
+     * Show sensitive data
+     */
+    showSensitiveData() {
+        const titleElement = document.getElementById('sensitive_data_title');
+        const warningElement = document.getElementById('sensitive_warning_text');
+        const dataElement = document.getElementById('sensitive_data_display');
+
+        let title, warning, data;
+
+        try {
+            if (this.currentSensitiveAction === 'seed_phrase') {
+                title = 'Seed Phrase';
+                warning = 'Never share your seed phrase with anyone! This is the master key to your wallet.';
+                data = wallet.getSeedPhrase();
+                
+                if (!data) {
+                    data = 'No seed phrase available (wallet created from private key)';
+                }
+            } else if (this.currentSensitiveAction === 'private_key') {
+                title = 'Private Key';
+                warning = 'Never share your private key with anyone! Anyone with this key has full control of your wallet.';
+                data = wallet.getPrivateKey();
+            }
+
+            if (titleElement) titleElement.textContent = title;
+            if (warningElement) warningElement.textContent = warning;
+            if (dataElement) {
+                dataElement.textContent = data;
+                dataElement.setAttribute('data-sensitive', data);
+            }
+
+            this.showModal('sensitive_data_modal');
+        } catch (error) {
+            console.error('Error displaying sensitive data:', error);
+            this.showErrorModal('Failed to retrieve sensitive data. Please try again.');
+        }
+    }
+
+    /**
+     * Copy sensitive data to clipboard
+     */
+    async copySensitiveData() {
+        const dataElement = document.getElementById('sensitive_data_display');
+        const copyBtn = document.getElementById('copy_sensitive_data_button');
+        
+        if (!dataElement || !copyBtn) return;
+
+        const data = dataElement.getAttribute('data-sensitive');
+        if (!data || data === 'No seed phrase available (wallet created from private key)') {
+            this.showErrorModal('No data available to copy.');
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(data);
+            
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span class="button-icon">✓</span>Copied!';
+            copyBtn.disabled = true;
+
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+                copyBtn.disabled = false;
+            }, 2000);
+
+            this.announceToScreenReader('Sensitive data copied to clipboard');
+        } catch (error) {
+            console.error('Failed to copy to clipboard:', error);
+            this.showErrorModal('Failed to copy to clipboard. Please select and copy manually.');
+        }
+    }
+
+    /**
+     * Handle logout
+     */
+    async handleLogout() {
+        const confirmLogout = confirm(
+            'Are you sure you want to logout?\n\n' +
+            '⚠️ WARNING: Make sure you have your seed phrase or private key saved securely. ' +
+            'Without it, you will lose access to your wallet permanently!\n\n' +
+            'This action cannot be undone.'
+        );
+
+        if (!confirmLogout) return;
+
+        try {
+            await wallet.logout();
+            this.hideModal('settings_modal');
+            // Reload the page to return to setup screen
+            window.location.reload();
+        } catch (error) {
+            console.error('Logout error:', error);
+            this.showErrorModal('Failed to logout. Please try again.');
+        }
     }
 }
 

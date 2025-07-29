@@ -154,20 +154,97 @@ class WoofWallet {
      */
     async storeCredentials(credentials) {
         try {
-            const data = {
+            await walletStorage.setMultiple({
                 privkey: credentials.privateKey.toWIF(),
                 mnemonic: credentials.mnemonic ? credentials.mnemonic.toString() : null,
                 derivation: credentials.derivation
-            };
+            });
 
-            await walletStorage.setMultiple(data);
             this.credentials = credentials;
-            
             return true;
         } catch (error) {
             console.error('Failed to store credentials:', error);
             throw error;
         }
+    }
+
+    /**
+     * Store password hash for authentication
+     */
+    async storePassword(password) {
+        try {
+            const hash = await this.simpleHash(password);
+            await walletStorage.set('walletPassword', hash);
+            return true;
+        } catch (error) {
+            console.error('Failed to store password:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Verify password for authentication
+     */
+    async verifyPassword(password) {
+        try {
+            const stored = await walletStorage.get('walletPassword');
+            if (!stored) {
+                // If no password is set, create one
+                await this.storePassword(password);
+                return true;
+            }
+            
+            const hash = await this.simpleHash(password);
+            return hash === stored;
+        } catch (error) {
+            console.error('Failed to verify password:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Simple hash function for demo purposes
+     * In production, use a proper cryptographic hash function like bcrypt
+     */
+    async simpleHash(text) {
+        try {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        } catch (error) {
+            console.error('Hash generation failed:', error);
+            // Fallback hash function if crypto.subtle is not available
+            let hash = 0;
+            for (let i = 0; i < text.length; i++) {
+                const char = text.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            return hash.toString();
+        }
+    }
+
+    /**
+     * Get seed phrase (mnemonic) if available
+     */
+    getSeedPhrase() {
+        if (!this.credentials) {
+            throw new Error('No wallet credentials loaded');
+        }
+        return this.credentials.mnemonic ? this.credentials.mnemonic.toString() : null;
+    }
+
+    /**
+     * Get private key in WIF format
+     */
+    getPrivateKey() {
+        if (!this.credentials) {
+            throw new Error('No wallet credentials loaded');
+        }
+        return this.credentials.privateKey.toWIF();
     }
 
     /**
@@ -615,6 +692,38 @@ class WoofWallet {
             return true;
         } catch (error) {
             console.error('Failed to clear wallet:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Logout and clear all wallet data including password
+     */
+    async logout() {
+        try {
+            // Clear all wallet data including password
+            await walletStorage.removeMultiple([
+                'privkey', 
+                'mnemonic', 
+                'derivation', 
+                'utxos',
+                'walletPassword',
+                'accepted_terms'
+            ]);
+            
+            // Reset instance variables
+            this.credentials = null;
+            this.acceptedTerms = false;
+            this.utxos = [];
+            this.inscriptions = {};
+            this.balance = { confirmed: 0, unconfirmed: 0, total: 0 };
+            this.transactions = [];
+            this.lastSync = null;
+            
+            console.log('Wallet logout completed');
+            return true;
+        } catch (error) {
+            console.error('Failed to logout:', error);
             throw error;
         }
     }

@@ -138,6 +138,9 @@
                     </div>
                 </div>
             </div>
+            <div class="wallet-actions">
+                <button id="main_settings_button" class="settings-icon-button" title="Settings" aria-label="Open settings menu">⚙️</button>
+            </div>
         </div>
 
         <div class="wallet-tabs">
@@ -344,6 +347,92 @@
                 <div class="error-icon">❌</div>
                 <p id="error_message">An error occurred</p>
                 <button id="close_error_button" class="primary-button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Wallet Settings</h3>
+                <button id="close_settings_modal" class="close-button" aria-label="Close settings">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-menu">
+                    <button id="main_show_seed_button" class="settings-option-button">
+                        <span class="option-icon">🔑</span>
+                        <div class="option-details">
+                            <h4>Show Seed Phrase</h4>
+                            <p>View your 12-word recovery phrase</p>
+                        </div>
+                    </button>
+                    <button id="main_show_private_key_button" class="settings-option-button">
+                        <span class="option-icon">🗝️</span>
+                        <div class="option-details">
+                            <h4>Show Private Key</h4>
+                            <p>View your wallet's private key</p>
+                        </div>
+                    </button>
+                    <button id="main_logout_button" class="settings-option-button logout-option">
+                        <span class="option-icon">🚪</span>
+                        <div class="option-details">
+                            <h4>Logout</h4>
+                            <p>Sign out and clear wallet data</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div id="auth_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="auth_modal_title">Authentication Required</h3>
+                <button id="close_auth_modal" class="close-button" aria-label="Close authentication">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-content">
+                    <p id="auth_modal_message">Please enter your password to continue</p>
+                    <div class="input-group">
+                        <input type="password" id="main_password_input" placeholder="Enter password" aria-label="Password">
+                    </div>
+                    <div class="modal-actions">
+                        <button id="confirm_auth_button" class="primary-button" disabled>Confirm</button>
+                        <button id="cancel_auth_button" class="secondary-button">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sensitive Data Display Modal -->
+    <div id="sensitive_data_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="sensitive_data_title">Sensitive Information</h3>
+                <button id="close_sensitive_modal" class="close-button" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="security-warning">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-text">
+                        <p><strong>Security Warning:</strong></p>
+                        <p id="sensitive_warning_text">Never share this information with anyone!</p>
+                    </div>
+                </div>
+                <div class="sensitive-data-container">
+                    <div id="sensitive_data_display" class="data-display" aria-live="polite"></div>
+                    <button id="copy_sensitive_data_button" class="copy-data-button">
+                        <span class="button-icon">📋</span>
+                        Copy to Clipboard
+                    </button>
+                </div>
+                <div class="modal-actions">
+                    <button id="close_sensitive_data_button" class="primary-button">Close</button>
+                </div>
             </div>
         </div>
     </div>
