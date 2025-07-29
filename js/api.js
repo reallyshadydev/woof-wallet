@@ -5,14 +5,15 @@
 
 class WalletAPI {
     constructor() {
+        // Use local proxy endpoints to avoid CORS issues
         this.blockchainAPI = {
-            baseUrl: 'https://api.dogepaywallet.space',
-            name: 'DogePay API'
+            baseUrl: '/api/dogepaywallet',
+            name: 'DogePay API (Proxied)'
         };
         
         this.inscriptionsAPI = {
-            baseUrl: 'https://wonky-ord.dogeord.io',
-            name: 'Wonky Ord API'
+            baseUrl: '/api/wonkyord',
+            name: 'Wonky Ord API (Proxied)'
         };
         
         this.retryCount = 3;
@@ -79,14 +80,14 @@ class WalletAPI {
      */
     async getBalance(address) {
         try {
-            const url = `${this.blockchainAPI.baseUrl}/address/${address}/balance`;
+            const url = `${this.blockchainAPI.baseUrl}/address/${address}`;
             const response = await this.fetchWithRetry(url);
             const data = await response.json();
             
             return {
-                confirmed: data.confirmed || 0,
-                unconfirmed: data.unconfirmed || 0,
-                total: (data.confirmed || 0) + (data.unconfirmed || 0)
+                confirmed: data.chain_stats?.funded_txo_sum || 0,
+                unconfirmed: data.mempool_stats?.funded_txo_sum || 0,
+                total: (data.chain_stats?.funded_txo_sum || 0) + (data.mempool_stats?.funded_txo_sum || 0)
             };
         } catch (error) {
             console.error('Failed to fetch balance:', error);

@@ -7,6 +7,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 // Configuration
 const PORT = process.env.PORT || 8000;
@@ -35,6 +36,39 @@ app.use((req, res, next) => {
 // Middleware for JSON parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Proxy middleware for external APIs to handle CORS
+// DogePay Wallet API proxy
+app.use('/api/dogepaywallet', createProxyMiddleware({
+    target: 'https://api.dogepaywallet.space',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/api/dogepaywallet': '', // Remove /api/dogepaywallet prefix
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        console.log(`[PROXY] ${req.method} ${req.url} -> https://api.dogepaywallet.space${req.url.replace('/api/dogepaywallet', '')}`);
+    },
+    onError: (err, req, res) => {
+        console.error('Proxy error:', err);
+        res.status(500).json({ error: 'Proxy error', message: err.message });
+    }
+}));
+
+// Wonky Ord API proxy
+app.use('/api/wonkyord', createProxyMiddleware({
+    target: 'https://wonky-ord.dogeord.io',
+    changeOrigin: true,
+    pathRewrite: {
+        '^/api/wonkyord': '', // Remove /api/wonkyord prefix
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        console.log(`[PROXY] ${req.method} ${req.url} -> https://wonky-ord.dogeord.io${req.url.replace('/api/wonkyord', '')}`);
+    },
+    onError: (err, req, res) => {
+        console.error('Proxy error:', err);
+        res.status(500).json({ error: 'Proxy error', message: err.message });
+    }
+}));
 
 // Static file serving with proper MIME types
 app.use(express.static('.', {
