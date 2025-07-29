@@ -74,7 +74,14 @@ class WoofWalletApp {
                 return;
             }
 
-            // Wallet exists, show main wallet screen
+            // Check if wallet is locked
+            if (wallet.isWalletLocked()) {
+                console.log('➡️ Showing lock screen');
+                ui.handleWalletLock();
+                return;
+            }
+
+            // Wallet exists and is unlocked, show main wallet screen
             console.log('➡️ Showing wallet screen');
             ui.showWalletScreen();
             console.log('✅ Wallet screen should now be visible');
