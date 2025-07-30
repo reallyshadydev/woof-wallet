@@ -643,37 +643,38 @@ textarea {
     color: #ffffff;
 }
 
-/* Bottom Navigation */
-.bottom-nav {
+/* Header Settings Button */
+.header-settings {
     display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
+    justify-content: flex-end;
+    padding: 10px 15px;
     background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
     border-top: 1px solid #2f2f4f;
 }
 
-.nav-btn {
-    background: none;
+.settings-btn {
+    background: linear-gradient(135deg, #5d5fef 0%, #7c3aed 100%);
     border: none;
-    color: #a9b4c2;
-    padding: 10px 8px;
+    color: #ffffff;
+    padding: 10px 20px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
-    flex: 1;
-    text-align: center;
+    border-radius: 8px;
     transition: all 0.3s ease;
-    border-top: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.nav-btn.active {
-    color: #ffffff;
-    border-top-color: #5d5fef;
-    background-color: rgba(93, 95, 239, 0.1);
+.settings-btn:hover {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(93, 95, 239, 0.3);
 }
 
-.nav-btn:hover {
-    color: #ffffff;
+.settings-btn:active {
+    transform: translateY(0);
 }
 
 /* Modals */
@@ -1099,7 +1100,7 @@ button:focus,
 input:focus,
 textarea:focus,
 .tab-btn:focus,
-.nav-btn:focus {
+.settings-btn:focus {
     outline: 2px solid #5d5fef;
     outline-offset: 2px;
 }
