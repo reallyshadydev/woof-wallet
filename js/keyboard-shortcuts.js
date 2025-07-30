@@ -171,8 +171,8 @@ class KeyboardShortcuts {
 
   refreshBalance() {
     // Refresh wallet balance
-    if (window.wallet && typeof window.wallet.updateBalance === 'function') {
-      window.wallet.updateBalance();
+    if (window.wallet && typeof window.wallet.refreshBalance === 'function') {
+      window.wallet.refreshBalance();
       this.showNotification('Balance refreshed', 'success');
     }
   }
