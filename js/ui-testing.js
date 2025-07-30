@@ -138,7 +138,7 @@ class UITestingSuite {
     const originalWidth = window.innerWidth;
     
     // Test touch targets
-    const buttons = document.querySelectorAll('.btn, .tab-button, .action-button');
+    const buttons = document.querySelectorAll('.btn, .tab-btn, .action-button');
     buttons.forEach((btn, index) => {
       const rect = btn.getBoundingClientRect();
       if (rect.width < 44 || rect.height < 44) {
@@ -218,7 +218,7 @@ class UITestingSuite {
     const warnings = [];
     
     // Test common text elements
-    const textElements = document.querySelectorAll('button, .tab-button, p, span, label');
+    const textElements = document.querySelectorAll('button, .tab-btn, p, span, label');
     let lowContrastCount = 0;
     
     textElements.forEach(el => {
@@ -315,7 +315,7 @@ class UITestingSuite {
   async testTabInteractions() {
     const warnings = [];
     
-    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabButtons = document.querySelectorAll('.tab-btn');
     if (tabButtons.length === 0) {
       return { passed: false, message: 'No tab buttons found' };
     }
@@ -339,7 +339,7 @@ class UITestingSuite {
     const warnings = [];
     
     // Test if hover effects are properly implemented
-    const hoverElements = document.querySelectorAll('.btn, .card, .tab-button');
+    const hoverElements = document.querySelectorAll('.btn, .card, .tab-btn');
     
     hoverElements.forEach((el, index) => {
       const style = window.getComputedStyle(el);
@@ -607,7 +607,7 @@ class UITestingSuite {
   async testButtonFeedback() {
     const warnings = [];
     
-    const buttons = document.querySelectorAll('.btn, .tab-button, .action-button');
+    const buttons = document.querySelectorAll('.btn, .tab-btn, .action-button');
     
     buttons.forEach((btn, index) => {
       const style = window.getComputedStyle(btn);

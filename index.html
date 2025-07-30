@@ -278,10 +278,10 @@
                 <button id="quick_receive_button" class="action-btn">Receive</button>
             </div>
 
-            <nav class="tab-nav">
-                <button id="tab_history" class="tab-btn active" data-tab="history">History</button>
-                <button id="tab_doginals" class="tab-btn" data-tab="inscriptions">Inscriptions</button>
-                <button id="tab_tokens" class="tab-btn" data-tab="tokens">Tokens</button>
+            <nav class="tab-nav" role="tablist" aria-label="Wallet content tabs">
+                <button id="tab_history" class="tab-btn active" data-tab="history" role="tab" aria-selected="true" aria-controls="history_tab">History</button>
+                <button id="tab_doginals" class="tab-btn" data-tab="inscriptions" role="tab" aria-selected="false" aria-controls="inscriptions_tab">Inscriptions</button>
+                <button id="tab_tokens" class="tab-btn" data-tab="tokens" role="tab" aria-selected="false" aria-controls="tokens_tab">Tokens</button>
             </nav>
 
             <main id="main-content" class="tab-content active" data-tab-content="history">
@@ -315,13 +315,10 @@
                 </div>
             </main>
 
-            <nav class="bottom-nav">
-                <button class="nav-btn active" data-section="wallet">Wallet</button>
-                <button class="nav-btn" data-section="launchpad">Launchpad</button>
-                <button class="nav-btn" data-section="inscribe">Inscribe</button>
-                <button class="nav-btn" data-section="mine">Mine</button>
-                <button id="main_settings_button" class="nav-btn" data-section="settings">Settings</button>
-            </nav>
+            <!-- Settings button moved to header area -->
+            <div class="header-settings">
+                <button id="main_settings_button" class="settings-btn">⚙️ Settings</button>
+            </div>
         </div>
     </div>
 
