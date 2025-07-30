@@ -364,23 +364,45 @@ class WalletUI {
     addButtonFeedback(button, type = 'success') {
         if (!button) return;
 
-        const originalText = button.textContent;
-        const feedback = {
-            success: { text: '✓ Success', class: 'btn-success' },
-            error: { text: '✗ Error', class: 'btn-error' },
-            loading: { text: '⌛ Loading...', class: 'btn-loading' }
-        };
-
-        if (feedback[type]) {
-            button.textContent = feedback[type].text;
-            button.classList.add(feedback[type].class);
-            button.setAttribute('aria-live', 'polite');
-
+        // Handle new address action buttons with structured content
+        const buttonText = button.querySelector('.button-text');
+        const isAddressButton = button.classList.contains('address-action-button');
+        
+        if (isAddressButton && buttonText) {
+            const originalText = buttonText.textContent;
+            button.classList.add(type);
+            
+            // For success, the CSS will add the checkmark
+            if (type === 'success') {
+                buttonText.textContent = 'Copied';
+            } else if (type === 'error') {
+                buttonText.textContent = 'Error';
+            }
+            
             setTimeout(() => {
-                button.textContent = originalText;
-                button.classList.remove(feedback[type].class);
-                button.removeAttribute('aria-live');
+                buttonText.textContent = originalText;
+                button.classList.remove(type);
             }, 2000);
+        } else {
+            // Legacy button feedback
+            const originalText = button.textContent;
+            const feedback = {
+                success: { text: '✓ Success', class: 'btn-success' },
+                error: { text: '✗ Error', class: 'btn-error' },
+                loading: { text: '⌛ Loading...', class: 'btn-loading' }
+            };
+
+            if (feedback[type]) {
+                button.textContent = feedback[type].text;
+                button.classList.add(feedback[type].class);
+                button.setAttribute('aria-live', 'polite');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove(feedback[type].class);
+                    button.removeAttribute('aria-live');
+                }, 2000);
+            }
         }
     }
 
@@ -600,6 +622,12 @@ class WalletUI {
         
         if (quickReceiveBtn) {
             quickReceiveBtn.addEventListener('click', () => this.showReceiveModal());
+        }
+
+        // QR code button in header
+        const showQrBtn = document.getElementById('show_qr_button');
+        if (showQrBtn) {
+            showQrBtn.addEventListener('click', () => this.showReceiveModal());
         }
 
         // Refresh buttons
