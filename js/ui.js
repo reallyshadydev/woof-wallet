@@ -606,10 +606,22 @@ class WalletUI {
      * Set up wallet actions
      */
     setupWalletActions() {
-        // Send DOGE
+        // Send DOGE form
+        const sendForm = document.querySelector('.send-form');
+        if (sendForm) {
+            sendForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleSendDoge();
+            });
+        }
+        
+        // Also handle direct button click for compatibility
         const sendBtn = document.getElementById('send_doge_button');
         if (sendBtn) {
-            sendBtn.addEventListener('click', () => this.handleSendDoge());
+            sendBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleSendDoge();
+            });
         }
 
         // Quick actions
@@ -617,11 +629,17 @@ class WalletUI {
         const quickReceiveBtn = document.getElementById('quick_receive_button');
         
         if (quickSendBtn) {
-            quickSendBtn.addEventListener('click', () => this.switchTab('send'));
+            quickSendBtn.addEventListener('click', () => {
+                console.log('🚀 Quick send button clicked');
+                this.switchTab('send');
+            });
         }
         
         if (quickReceiveBtn) {
-            quickReceiveBtn.addEventListener('click', () => this.showReceiveModal());
+            quickReceiveBtn.addEventListener('click', () => {
+                console.log('📥 Quick receive button clicked');
+                this.showReceiveModal();
+            });
         }
 
         // QR code button in header
@@ -817,16 +835,20 @@ class WalletUI {
      * Switch wallet tabs
      */
     switchTab(tabId) {
+        console.log(`🔄 Switching to tab: ${tabId}`);
+        
         // Map old tab IDs to new ones for backward compatibility
         const tabMap = {
             'overview': 'history',
             'doginals': 'inscriptions',
             'tokens': 'tokens',
             'history': 'history',
-            'inscriptions': 'inscriptions'
+            'inscriptions': 'inscriptions',
+            'send': 'send'
         };
         
         const actualTabId = tabMap[tabId] || tabId;
+        console.log(`🎯 Mapped to actual tab: ${actualTabId}`);
         
         // Update tab buttons - use new .tab-btn class
         const tabButtons = document.querySelectorAll('.tab-btn');
@@ -1418,10 +1440,21 @@ class WalletUI {
         if (button) {
             button.disabled = loading;
             if (loading) {
-                button.dataset.originalText = button.textContent;
-                button.textContent = 'Loading...';
+                button.classList.add('button-loading');
+                const btnText = button.querySelector('.btn-text');
+                if (btnText) {
+                    button.dataset.originalText = btnText.textContent;
+                } else {
+                    button.dataset.originalText = button.textContent;
+                }
             } else {
-                button.textContent = button.dataset.originalText || button.textContent;
+                button.classList.remove('button-loading');
+                const btnText = button.querySelector('.btn-text');
+                if (btnText && button.dataset.originalText) {
+                    btnText.textContent = button.dataset.originalText;
+                } else if (button.dataset.originalText) {
+                    button.textContent = button.dataset.originalText;
+                }
             }
         }
     }
@@ -1611,7 +1644,10 @@ class WalletUI {
         // Settings button
         const settingsBtn = document.getElementById('main_settings_button');
         if (settingsBtn) {
-            settingsBtn.addEventListener('click', () => this.showSettingsModal());
+            settingsBtn.addEventListener('click', () => {
+                console.log('⚙️ Settings button clicked');
+                this.showSettingsModal();
+            });
         }
 
         // Settings modal close buttons

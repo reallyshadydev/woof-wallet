@@ -5,12 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Woof Wallet - Secure Dogecoin and Doginals Web Wallet">
     <title>Woof Wallet</title>
+    <!-- Add Inter font for better typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Skip Navigation Links for Accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a href="#navigation" class="skip-link">Skip to navigation</a>
+    
+    <!-- Add main H1 heading for screen readers -->
+    <h1 class="sr-only">Woof Wallet - Dogecoin Web Wallet Application</h1>
     
     <!-- Loading Screen -->
     <div id="loading_screen" class="screen active" role="main" aria-live="polite">
@@ -280,6 +287,7 @@
 
             <nav class="tab-nav" role="tablist" aria-label="Wallet content tabs">
                 <button id="tab_history" class="tab-btn active" data-tab="history" role="tab" aria-selected="true" aria-controls="history_tab">History</button>
+                <button id="tab_send" class="tab-btn" data-tab="send" role="tab" aria-selected="false" aria-controls="send_tab">Send</button>
                 <button id="tab_doginals" class="tab-btn" data-tab="inscriptions" role="tab" aria-selected="false" aria-controls="inscriptions_tab">Inscriptions</button>
                 <button id="tab_tokens" class="tab-btn" data-tab="tokens" role="tab" aria-selected="false" aria-controls="tokens_tab">Tokens</button>
             </nav>
@@ -314,16 +322,9 @@
                     <p>Tokens content goes here.</p>
                 </div>
             </main>
-
-            <!-- Settings button moved to header area -->
-            <div class="header-settings">
-                <button id="main_settings_button" class="settings-btn">⚙️ Settings</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Send Tab Content (Hidden by default) -->
-    <div id="send_tab" class="tab-content" role="tabpanel" aria-labelledby="tab_send" aria-hidden="true" style="display: none;">
+            
+            <main class="tab-content" data-tab-content="send" style="display: none;">
+                <div id="send_tab">
         <form class="send-form" aria-label="Send Dogecoin form">
             <h3>Send Dogecoin</h3>
             <div class="form-group">
@@ -385,6 +386,14 @@
                 Review all details before sending. Transactions cannot be reversed.
             </div>
         </form>
+                </div>
+            </main>
+
+            <!-- Settings button at bottom -->
+            <div class="wallet-footer">
+                <button id="main_settings_button" class="settings-btn">⚙️ Settings</button>
+            </div>
+        </div>
     </div>
 
     <!-- Doginal Detail Modal -->
