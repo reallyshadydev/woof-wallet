@@ -708,6 +708,13 @@ class WoofWallet {
     }
 
     /**
+     * Get current wallet balance
+     */
+    getBalance() {
+        return this.balance;
+    }
+
+    /**
      * Calculate available balance for sending (excluding inscription UTXOs)
      */
     async getAvailableBalance() {
