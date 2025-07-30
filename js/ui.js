@@ -739,6 +739,11 @@ class WalletUI {
             targetScreen.classList.add('active');
             this.currentScreen = screenId;
             console.log(`✅ Showing screen: ${screenId}`);
+            
+            // Update button states when screen changes
+            if (screenId === 'wallet_screen') {
+                setTimeout(() => this.updateButtonStates(), 100);
+            }
         } else {
             console.error(`❌ Screen not found: ${screenId}`);
         }
@@ -808,8 +813,16 @@ class WalletUI {
      * Show wallet screen
      */
     showWalletScreen() {
+        // Safety check: don't show wallet screen without credentials
+        if (!wallet.credentials) {
+            console.warn('⚠️ Attempted to show wallet screen without credentials - redirecting to setup');
+            this.showSetupScreen();
+            return;
+        }
+        
         this.showScreen('wallet_screen');
         this.updateWalletDisplay();
+        this.updateButtonStates(); // Ensure buttons are in correct state
         this.switchTab('history'); // Start with history tab in new UI
         
         // Extra safety check to ensure loading screen is hidden
@@ -1162,7 +1175,13 @@ class WalletUI {
      * Update wallet display
      */
     updateWalletDisplay() {
-        if (!wallet.credentials) return;
+        if (!wallet.credentials) {
+            this.updateButtonStates(); // Update button states even when no credentials
+            return;
+        }
+        
+        // Update button states
+        this.updateButtonStates();
 
         const address = wallet.getAddress();
         
@@ -1518,8 +1537,21 @@ class WalletUI {
      * Show send modal with enhanced functionality
      */
     showSendModal() {
-        if (!wallet.credentials) {
-            this.showErrorModal('Wallet not loaded. Please wait for the wallet to initialize.');
+        if (!this.isWalletReady()) {
+            // Check if wallet is just loading
+            if (wallet.isLoading) {
+                this.showErrorModal('Wallet is still loading. Please wait a moment and try again.');
+            } else if (!wallet.credentials) {
+                this.showErrorModal('No wallet found. Please create or import a wallet first.');
+                // Redirect to setup after a delay
+                setTimeout(() => {
+                    if (!wallet.credentials) {
+                        this.showSetupScreen();
+                    }
+                }, 2000);
+            } else if (wallet.isLocked) {
+                this.showErrorModal('Wallet is locked. Please unlock it first.');
+            }
             return;
         }
 
@@ -1556,8 +1588,21 @@ class WalletUI {
      * Show receive modal with enhanced functionality
      */
     showReceiveModal() {
-        if (!wallet.credentials) {
-            this.showErrorModal('Wallet not loaded. Please wait for the wallet to initialize.');
+        if (!this.isWalletReady()) {
+            // Check if wallet is just loading
+            if (wallet.isLoading) {
+                this.showErrorModal('Wallet is still loading. Please wait a moment and try again.');
+            } else if (!wallet.credentials) {
+                this.showErrorModal('No wallet found. Please create or import a wallet first.');
+                // Redirect to setup after a delay
+                setTimeout(() => {
+                    if (!wallet.credentials) {
+                        this.showSetupScreen();
+                    }
+                }, 2000);
+            } else if (wallet.isLocked) {
+                this.showErrorModal('Wallet is locked. Please unlock it first.');
+            }
             return;
         }
 
@@ -1809,8 +1854,21 @@ class WalletUI {
      * Show settings modal
      */
     showSettingsModal() {
-        if (!wallet.credentials) {
-            this.showErrorModal('Wallet not loaded. Please wait for the wallet to initialize.');
+        if (!this.isWalletReady()) {
+            // Check if wallet is just loading
+            if (wallet.isLoading) {
+                this.showErrorModal('Wallet is still loading. Please wait a moment and try again.');
+            } else if (!wallet.credentials) {
+                this.showErrorModal('No wallet found. Please create or import a wallet first.');
+                // Redirect to setup after a delay
+                setTimeout(() => {
+                    if (!wallet.credentials) {
+                        this.showSetupScreen();
+                    }
+                }, 2000);
+            } else if (wallet.isLocked) {
+                this.showErrorModal('Wallet is locked. Please unlock it first.');
+            }
             return;
         }
 
@@ -1841,6 +1899,41 @@ class WalletUI {
     }
 
 
+
+    /**
+     * Check if wallet is ready for operations
+     */
+    isWalletReady() {
+        return !!(wallet && wallet.credentials && !wallet.isLocked);
+    }
+
+    /**
+     * Update button states based on wallet readiness
+     */
+    updateButtonStates() {
+        const isReady = this.isWalletReady();
+        
+        // Get main action buttons
+        const sendBtn = document.getElementById('quick_send_button');
+        const receiveBtn = document.getElementById('quick_receive_button');
+        const settingsBtn = document.getElementById('main_settings_button');
+        
+        // Update button states
+        [sendBtn, receiveBtn, settingsBtn].forEach(btn => {
+            if (btn) {
+                btn.disabled = !isReady;
+                if (!isReady) {
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                    btn.title = 'Wallet not ready';
+                } else {
+                    btn.style.opacity = '';
+                    btn.style.cursor = '';
+                    btn.title = '';
+                }
+            }
+        });
+    }
 
     /**
      * Show sensitive data
