@@ -338,15 +338,16 @@
             </div>
         </header>
 
-        <nav id="navigation" class="wallet-tabs" role="tablist" aria-label="Wallet navigation" style="display: none;">
+        <nav id="navigation" class="wallet-tabs" role="tablist" aria-label="Wallet navigation">
             <button 
-                id="tab_overview" 
+                id="tab_history" 
                 class="tab-button active" 
                 role="tab" 
                 aria-selected="true" 
-                aria-controls="overview_tab"
+                aria-controls="history_tab"
                 tabindex="0">
-                Overview
+                <span class="tab-icon" aria-hidden="true">🕒</span>
+                History
             </button>
             <button 
                 id="tab_doginals" 
@@ -355,31 +356,24 @@
                 aria-selected="false" 
                 aria-controls="doginals_tab"
                 tabindex="-1">
-                Doginals
+                <span class="tab-icon" aria-hidden="true">🖼️</span>
+                Inscriptions
             </button>
             <button 
-                id="tab_send" 
+                id="tab_tokens" 
                 class="tab-button" 
                 role="tab" 
                 aria-selected="false" 
-                aria-controls="send_tab"
+                aria-controls="tokens_tab"
                 tabindex="-1">
-                Send
-            </button>
-            <button 
-                id="tab_history" 
-                class="tab-button" 
-                role="tab" 
-                aria-selected="false" 
-                aria-controls="history_tab"
-                tabindex="-1">
-                History
+                <span class="tab-icon" aria-hidden="true">🪙</span>
+                Tokens
             </button>
         </nav>
 
         <main id="main-content" class="wallet-content">
-            <!-- Overview Tab -->
-            <section id="overview_tab" class="tab-content active" role="tabpanel" aria-labelledby="tab_overview">
+            <!-- Main Balance Section - Always Visible -->
+            <section class="main-balance-section">
                 <!-- Modern Crypto Wallet Balance Card -->
                 <div class="crypto-balance-card">
                     <div class="wallet-header-modern">
@@ -392,8 +386,21 @@
                         </div>
                     </div>
                     
+                    <div class="total-balance-label">TOTAL BALANCE</div>
+                    <div class="address-display">
+                        <span class="address-text">D7fqCm1dGwrj9PQx9JXuJKmmATZnaritdZ</span>
+                        <div class="address-actions-inline">
+                            <button class="address-btn copy-btn">
+                                📋 COPY
+                            </button>
+                            <button class="address-btn qr-btn">
+                                📱 QR
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="main-balance">
-                        <span id="overview_balance" role="text" aria-live="polite">1250.45</span>
+                        <span id="overview_balance" role="text" aria-live="polite">0.00000000</span>
                         <span class="balance-currency">DOGE</span>
                     </div>
                     
@@ -425,6 +432,67 @@
                     <div class="stat-card" role="group" aria-labelledby="total-txs-label">
                         <div id="total-txs-label" class="stat-label">Total Txs</div>
                         <div id="overview_total_txs" class="stat-value" role="text" aria-live="polite">5</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Tab - Active by default -->
+            <section id="history_tab" class="tab-content active" role="tabpanel" aria-labelledby="tab_history">
+                <div id="history_container" class="history-list" role="log" aria-live="polite" aria-label="Transaction history">
+                    <!-- Sample Modern Transaction Cards -->
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #1</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+15.66 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #2</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+41.30 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #3</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+58.30 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #4</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+95.40 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #5</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+18.01 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -516,104 +584,28 @@
                 </form>
             </section>
 
-            <!-- Transaction History Tab -->
-            <section id="history_tab" class="tab-content" role="tabpanel" aria-labelledby="tab_history" aria-hidden="true">
-                <div class="tab-header">
-                    <h3>History</h3>
-                    <button 
-                        id="refresh_history_button" 
-                        class="refresh-button"
-                        aria-label="Refresh transaction history">
-                        <span aria-hidden="true">🔄</span>
-                    </button>
-                </div>
-                <div class="history-filters">
-                    <label for="history_filter" class="sr-only">Filter transactions</label>
-                    <select id="history_filter" aria-label="Filter transaction history">
-                        <option value="all">All Transactions</option>
-                        <option value="sent">Sent</option>
-                        <option value="received">Received</option>
-                    </select>
-                </div>
-                <div id="history_container" class="history-list" role="log" aria-live="polite" aria-label="Transaction history">
-                    <!-- Sample Modern Transaction Cards -->
-                    <div class="transaction-item-modern">
-                        <div class="transaction-info">
-                            <div class="transaction-title">Transaction #1</div>
-                            <div class="transaction-time">2 hours ago</div>
-                        </div>
-                        <div>
-                            <div class="transaction-amount positive">+40.15 DOGE</div>
-                            <div class="transaction-status">Received</div>
-                        </div>
-                    </div>
-                    
-                    <div class="transaction-item-modern">
-                        <div class="transaction-info">
-                            <div class="transaction-title">Transaction #2</div>
-                            <div class="transaction-time">2 hours ago</div>
-                        </div>
-                        <div>
-                            <div class="transaction-amount positive">+26.98 DOGE</div>
-                            <div class="transaction-status">Received</div>
-                        </div>
-                    </div>
-                    
-                    <div class="transaction-item-modern">
-                        <div class="transaction-info">
-                            <div class="transaction-title">Transaction #3</div>
-                            <div class="transaction-time">2 hours ago</div>
-                        </div>
-                        <div>
-                            <div class="transaction-amount positive">+7.28 DOGE</div>
-                            <div class="transaction-status">Received</div>
-                        </div>
-                    </div>
-                    
-                    <div class="transaction-item-modern">
-                        <div class="transaction-info">
-                            <div class="transaction-title">Transaction #4</div>
-                            <div class="transaction-time">2 hours ago</div>
-                        </div>
-                        <div>
-                            <div class="transaction-amount positive">+37.71 DOGE</div>
-                            <div class="transaction-status">Received</div>
-                        </div>
-                    </div>
-                    
-                    <div class="transaction-item-modern">
-                        <div class="transaction-info">
-                            <div class="transaction-title">Transaction #5</div>
-                            <div class="transaction-time">2 hours ago</div>
-                        </div>
-                        <div>
-                            <div class="transaction-amount positive">+15.54 DOGE</div>
-                            <div class="transaction-status">Received</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+
         </main>
         
         <!-- Modern Bottom Navigation -->
         <nav class="bottom-nav-modern" role="tablist" aria-label="Main navigation">
-            <a href="#" class="nav-item-modern active" role="tab" aria-selected="true" aria-controls="overview_tab" id="nav_overview">
-                <span class="nav-icon" aria-hidden="true">📊</span>
-                <span class="nav-label">History</span>
+            <a href="#" class="nav-item-modern active" role="tab" aria-selected="true" aria-controls="overview_tab" id="nav_wallet">
+                <span class="nav-icon" aria-hidden="true">💼</span>
+                <span class="nav-label">Wallet</span>
             </a>
-            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="doginals_tab" id="nav_doginals">
-                <span class="nav-icon" aria-hidden="true">🖼️</span>
-                <span class="nav-label">Inscriptions</span>
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="launchpad_tab" id="nav_launchpad">
+                <span class="nav-icon" aria-hidden="true">🚀</span>
+                <span class="nav-label">Launchpad</span>
             </a>
-            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="send_tab" id="nav_send">
-                <span class="nav-icon" aria-hidden="true">📤</span>
-                <span class="nav-label">Tokens</span>
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="doginals_tab" id="nav_inscribe">
+                <span class="nav-icon" aria-hidden="true">✏️</span>
+                <span class="nav-label">Inscribe</span>
             </a>
-            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="overview_tab" id="nav_mine">
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="mine_tab" id="nav_mine">
                 <span class="nav-icon" aria-hidden="true">⛏️</span>
                 <span class="nav-label">Mine</span>
             </a>
-            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="history_tab" id="nav_settings">
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="settings_tab" id="nav_settings">
                 <span class="nav-icon" aria-hidden="true">⚙️</span>
                 <span class="nav-label">Settings</span>
             </a>
