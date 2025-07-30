@@ -710,6 +710,12 @@ p {
   transform: translateY(-1px) scale(1.01);
 }
 
+.primary-button:focus,
+.btn-primary:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
 /* Secondary Button */
 .secondary-button,
 .btn-secondary {
@@ -726,6 +732,12 @@ p {
   border-color: var(--color-primary);
   color: var(--color-primary);
   box-shadow: var(--shadow-md);
+}
+
+.secondary-button:focus,
+.btn-secondary:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
 }
 
 /* Accent Button */
@@ -1492,7 +1504,7 @@ textarea {
   font-size: clamp(var(--font-3xl), 4vw, var(--font-5xl));
   font-weight: var(--font-weight-bold);
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  line-height: 1.1;
+  line-height: 1.2;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2719,8 +2731,65 @@ input[type="number"] {
   background: #e2e8f0;
 }
 
+.close-button:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
 .modal-body {
   padding: var(--space-xl);
+}
+
+/* Additional Button Focus Styles */
+.password-toggle:focus,
+.settings-option-button:focus,
+.copy-button:focus,
+.copy-data-button:focus,
+.biometric-toggle:focus,
+.doginal-item {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-md);
+}
+
+.doginal-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.doginal-item:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Loading Button States */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.btn-loading::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.btn-loading .btn-text {
+  opacity: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* ============================================

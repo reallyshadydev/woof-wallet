@@ -1127,7 +1127,18 @@ class WalletUI {
     createDoginalItem(inscription) {
         const item = document.createElement('div');
         item.className = 'doginal-item';
-        item.addEventListener('click', () => this.showDoginalModal(inscription));
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('aria-label', `View doginal ${inscription.id}`);
+        
+        const clickHandler = () => this.showDoginalModal(inscription);
+        item.addEventListener('click', clickHandler);
+        item.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                clickHandler();
+            }
+        });
 
         const preview = document.createElement('div');
         preview.className = 'doginal-preview';

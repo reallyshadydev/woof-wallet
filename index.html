@@ -44,7 +44,7 @@
     <div id="wallet_lock_screen" class="screen" role="main">
         <div class="container">
             <div class="logo" aria-hidden="true">🔒</div>
-            <h1>Wallet Locked</h1>
+            <h2>Wallet Locked</h2>
             <div class="lock-content">
                 <div class="info-box" role="alert">
                     <p>Your wallet has been locked for security. Enter your password to unlock and continue using your wallet.</p>
@@ -59,7 +59,7 @@
                                 id="unlock_password_input" 
                                 placeholder="Enter your password" 
                                 aria-label="Password to unlock wallet"
-                                aria-describedby="unlock-requirements"
+                                aria-describedby="unlock-requirements unlock-password-error"
                                 required
                                 autocomplete="current-password">
                             <button 
@@ -74,11 +74,12 @@
                         <div id="unlock-requirements" class="sr-only">
                             Enter the password you set up when creating your wallet
                         </div>
+                        <div id="unlock-password-error" class="form-error" role="alert" aria-live="polite"></div>
                     </div>
 
                     <div class="button-group" role="group" aria-label="Wallet unlock actions">
                         <button id="unlock_wallet_button" class="primary-button" disabled aria-describedby="unlock-status">
-                            Unlock Wallet
+                            <span class="btn-text">Unlock Wallet</span>
                         </button>
                         <button id="logout_from_lock_button" class="secondary-button" type="button">
                             Logout
@@ -99,7 +100,7 @@
     <div id="accept_terms_screen" class="screen" role="main">
         <div class="container">
             <div class="logo" aria-hidden="true">🐕</div>
-            <h1>Welcome to Woof Wallet</h1>
+            <h2>Welcome to Woof Wallet</h2>
             <div class="terms-content" role="complementary">
                 <p>By using Woof Wallet, you acknowledge and agree:</p>
                 <ul role="list">
@@ -127,7 +128,7 @@
     <div id="setup_screen" class="screen" role="main">
         <div class="container">
             <div class="logo" aria-hidden="true">🐕</div>
-            <h1>Set Up Your Wallet</h1>
+            <h2>Set Up Your Wallet</h2>
             <div class="setup-options" role="group" aria-label="Wallet setup options">
                 <button id="new_wallet_button" class="setup-option" aria-describedby="new-wallet-desc">
                     <div class="option-icon" aria-hidden="true">🆕</div>
@@ -150,7 +151,7 @@
     <!-- Create Wallet Screen -->
     <div id="create_screen" class="screen">
         <div class="container">
-            <h1>Your Recovery Phrase</h1>
+            <h2>Your Recovery Phrase</h2>
             <div class="warning-box">
                 <p><strong>⚠️ Important:</strong> Write down these 12 words in order and store them securely. This is the only way to recover your wallet!</p>
             </div>
@@ -162,7 +163,7 @@
     <!-- Password Setup Screen -->
     <div id="password_setup_screen" class="screen">
         <div class="container">
-            <h1>🔒 Secure Your Wallet</h1>
+            <h2>🔒 Secure Your Wallet</h2>
             <div class="password-setup-content">
                 <div class="info-box">
                     <h3>Create a Strong Password</h3>
@@ -245,7 +246,7 @@
     <!-- Import Options Screen -->
     <div id="import_options_screen" class="screen">
         <div class="container">
-            <h1>Import Method</h1>
+            <h2>Import Method</h2>
             <div class="import-options">
                 <button id="import_seed_button" class="setup-option">
                     <div class="option-icon">🔤</div>
@@ -269,7 +270,7 @@
     <!-- Import Seed Screen -->
     <div id="import_seed_screen" class="screen">
         <div class="container">
-            <h1>Enter Your Seed Phrase</h1>
+            <h2>Enter Your Seed Phrase</h2>
             <div class="seed-input-container">
                 <textarea id="seed_textarea" placeholder="Enter your 12-word recovery phrase here..." rows="4"></textarea>
             </div>
@@ -281,7 +282,7 @@
     <!-- Import Private Key Screen -->
     <div id="import_key_screen" class="screen">
         <div class="container">
-            <h1>Enter Private Key</h1>
+            <h2>Enter Private Key</h2>
             <div class="key-input-container">
                 <textarea id="private_key_textarea" placeholder="Enter your WIF private key here..." rows="3"></textarea>
             </div>
@@ -292,6 +293,7 @@
 
     <!-- Main Wallet Screen -->
     <div id="wallet_screen" class="screen" role="main">
+        <h1 class="sr-only">Woof Wallet Dashboard</h1>
         <header class="wallet-header" role="banner">
             <div class="wallet-info">
                 <div class="balance-section">
@@ -421,13 +423,14 @@
                             type="text" 
                             id="send_address" 
                             placeholder="Enter Dogecoin address..." 
-                            aria-describedby="address-help"
+                            aria-describedby="address-help address-error"
                             required
                             pattern="[DN][A-Za-z0-9]{33}"
                             title="Enter a valid Dogecoin address starting with D or N" />
                         <div id="address-help" class="sr-only">
                             Enter the Dogecoin address where you want to send coins
                         </div>
+                        <div id="address-error" class="form-error" role="alert" aria-live="polite"></div>
                     </div>
                     <div class="form-group">
                         <label for="send_amount">Amount (DOGE)</label>
@@ -437,7 +440,7 @@
                             placeholder="0.00" 
                             step="0.01" 
                             min="0.01" 
-                            aria-describedby="amount-help available-balance"
+                            aria-describedby="amount-help available-balance amount-error"
                             required />
                         <div class="balance-info" id="available-balance">
                             Available: <span id="available_balance">0 DOGE</span>
@@ -445,6 +448,7 @@
                         <div id="amount-help" class="sr-only">
                             Enter the amount of Dogecoin to send
                         </div>
+                        <div id="amount-error" class="form-error" role="alert" aria-live="polite"></div>
                     </div>
                     <div class="form-group">
                         <label for="send_fee">Network Fee (DOGE)</label>
@@ -454,11 +458,12 @@
                             value="1.0" 
                             step="0.1" 
                             min="0.1" 
-                            aria-describedby="fee-help"
+                            aria-describedby="fee-help fee-error"
                             required />
                         <div id="fee-help" class="sr-only">
                             Network fee for processing the transaction
                         </div>
+                        <div id="fee-error" class="form-error" role="alert" aria-live="polite"></div>
                     </div>
                     <div class="safety-check" role="region" aria-labelledby="safety-heading">
                         <div class="safety-info" id="safety-heading">
@@ -471,7 +476,7 @@
                         class="primary-button" 
                         type="submit"
                         aria-describedby="send-warning">
-                        Send DOGE
+                        <span class="btn-text">Send DOGE</span>
                     </button>
                     <div id="send-warning" class="sr-only">
                         Review all details before sending. Transactions cannot be reversed.
@@ -526,7 +531,8 @@
                 </div>
                 <div class="send-doginal-section">
                     <h4>Send This Doginal</h4>
-                    <input type="text" id="doginal_send_address" placeholder="Enter recipient address..." />
+                    <label for="doginal_send_address" class="sr-only">Recipient address for doginal</label>
+                    <input type="text" id="doginal_send_address" placeholder="Enter recipient address..." aria-label="Recipient address for doginal" />
                     <button id="send_doginal_button" class="primary-button">Send Doginal</button>
                 </div>
             </div>
@@ -663,10 +669,11 @@
                 <div class="auth-content">
                     <p id="auth_modal_message">Please enter your password to continue</p>
                     <div class="input-group">
+                        <label for="main_password_input" class="sr-only">Password</label>
                         <input type="password" id="main_password_input" placeholder="Enter password" aria-label="Password">
                     </div>
                     <div class="modal-actions">
-                        <button id="confirm_auth_button" class="primary-button" disabled>Confirm</button>
+                        <button id="confirm_auth_button" class="primary-button" disabled><span class="btn-text">Confirm</span></button>
                         <button id="cancel_auth_button" class="secondary-button">Cancel</button>
                     </div>
                 </div>
