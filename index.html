@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Theme and accessibility meta tags -->
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#FFCC33">
     <meta name="color-scheme" content="light dark">
     
     <link rel="stylesheet" href="styles.css">
@@ -304,13 +304,24 @@
                     <div class="address-label">Your Address</div>
                     <div class="address-container">
                         <span id="wallet_address" class="address" role="text" aria-live="polite" aria-label="Wallet address">Loading...</span>
-                        <button 
-                            id="copy_address_button" 
-                            class="copy-button" 
-                            title="Copy Address" 
-                            aria-label="Copy wallet address to clipboard">
-                            <span aria-hidden="true">📋</span>
-                        </button>
+                        <div class="address-actions">
+                            <button 
+                                id="copy_address_button" 
+                                class="address-action-button copy-button" 
+                                title="Copy Address" 
+                                aria-label="Copy wallet address to clipboard">
+                                <span aria-hidden="true">📋</span>
+                                <span class="button-text">Copy</span>
+                            </button>
+                            <button 
+                                id="show_qr_button" 
+                                class="address-action-button qr-button" 
+                                title="Show QR Code" 
+                                aria-label="Show wallet address QR code">
+                                <span aria-hidden="true">📱</span>
+                                <span class="button-text">QR</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
