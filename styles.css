@@ -383,6 +383,17 @@ textarea {
     flex-direction: column;
 }
 
+#wallet_screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#wallet_screen .wallet-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
 .wallet-header {
     display: flex;
     justify-content: space-between;
@@ -643,20 +654,24 @@ textarea {
     color: #ffffff;
 }
 
-/* Header Settings Button */
-.header-settings {
+/* Wallet Footer for Settings Button */
+.wallet-footer {
     display: flex;
-    justify-content: flex-end;
-    padding: 10px 15px;
+    justify-content: center;
+    padding: 15px 20px;
     background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
     border-top: 1px solid #2f2f4f;
+    margin-top: auto;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
 }
 
 .settings-btn {
     background: linear-gradient(135deg, #5d5fef 0%, #7c3aed 100%);
     border: none;
     color: #ffffff;
-    padding: 10px 20px;
+    padding: 12px 20px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -664,7 +679,10 @@ textarea {
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    width: 100%;
+    max-width: 200px;
 }
 
 .settings-btn:hover {

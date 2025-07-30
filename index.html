@@ -314,11 +314,11 @@
                     <p>Tokens content goes here.</p>
                 </div>
             </main>
+        </div>
 
-            <!-- Settings button moved to header area -->
-            <div class="header-settings">
-                <button id="main_settings_button" class="settings-btn">⚙️ Settings</button>
-            </div>
+        <!-- Settings button at bottom of wallet -->
+        <div class="wallet-footer">
+            <button id="main_settings_button" class="settings-btn">⚙️ Settings</button>
         </div>
     </div>
 
@@ -496,6 +496,78 @@
                 <div class="error-icon">❌</div>
                 <p id="error_message">An error occurred</p>
                 <button id="close_error_button" class="primary-button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Modal -->
+    <div id="send_modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Send Dogecoin</h3>
+                <button id="close_send_modal" class="close-button" aria-label="Close send modal">×</button>
+            </div>
+            <div class="modal-body">
+                <form class="send-form" aria-label="Send Dogecoin form">
+                    <div class="form-group">
+                        <label for="modal_send_address">Recipient Address</label>
+                        <input 
+                            type="text" 
+                            id="modal_send_address" 
+                            placeholder="Enter Dogecoin address..." 
+                            aria-describedby="modal-address-help modal-address-error"
+                            required
+                            pattern="[DN][A-Za-z0-9]{33}"
+                            title="Enter a valid Dogecoin address starting with D or N" />
+                        <div id="modal-address-help" class="sr-only">
+                            Enter the Dogecoin address where you want to send coins
+                        </div>
+                        <div id="modal-address-error" class="form-error" role="alert" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_send_amount">Amount (DOGE)</label>
+                        <input 
+                            type="number" 
+                            id="modal_send_amount" 
+                            placeholder="0.00" 
+                            step="0.01" 
+                            min="0.01" 
+                            aria-describedby="modal-amount-help modal-available-balance modal-amount-error"
+                            required />
+                        <div class="balance-info" id="modal-available-balance">
+                            Available: <span id="modal_available_balance">0 DOGE</span>
+                        </div>
+                        <div id="modal-amount-help" class="sr-only">
+                            Enter the amount of Dogecoin to send
+                        </div>
+                        <div id="modal-amount-error" class="form-error" role="alert" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal_send_fee">Network Fee (DOGE)</label>
+                        <input 
+                            type="number" 
+                            id="modal_send_fee" 
+                            value="1.0" 
+                            step="0.1" 
+                            min="0.1" 
+                            aria-describedby="modal-fee-help modal-fee-error"
+                            required />
+                        <div id="modal-fee-help" class="sr-only">
+                            Network fee for processing the transaction
+                        </div>
+                        <div id="modal-fee-error" class="form-error" role="alert" aria-live="polite"></div>
+                    </div>
+                    <button 
+                        id="modal_send_doge_button" 
+                        class="primary-button" 
+                        type="submit"
+                        aria-describedby="modal-send-warning">
+                        <span class="btn-text">Send DOGE</span>
+                    </button>
+                    <div id="modal-send-warning" class="sr-only">
+                        Review all details before sending. Transactions cannot be reversed.
+                    </div>
+                </form>
             </div>
         </div>
     </div>
