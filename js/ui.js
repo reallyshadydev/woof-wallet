@@ -1060,7 +1060,15 @@ class WalletUI {
         const balanceElement = document.getElementById('doge_balance');
         if (balanceElement) {
             const balance = wallet.balance.total / 100000000; // Convert to DOGE
-            balanceElement.textContent = `${balance.toFixed(8)} DOGE`;
+            // Format with appropriate decimals based on amount
+            const formattedBalance = balance >= 1 ? balance.toFixed(2) : balance.toFixed(8);
+            balanceElement.textContent = `${formattedBalance} DOGE`;
+            
+            // Update aria-label for screen readers
+            balanceElement.setAttribute('aria-label', `Current balance: ${formattedBalance} Dogecoin`);
+            
+            // Announce balance update to screen readers
+            this.announceToScreenReader(`Balance updated: ${formattedBalance} DOGE`);
         }
     }
 
@@ -1074,7 +1082,12 @@ class WalletUI {
 
         if (balanceElement) {
             const balance = wallet.balance.total / 100000000;
-            balanceElement.textContent = `${balance.toFixed(2)} DOGE`;
+            // Consistent formatting with header balance
+            const formattedBalance = balance >= 1 ? balance.toFixed(2) : balance.toFixed(8);
+            balanceElement.textContent = `${formattedBalance} DOGE`;
+            
+            // Update aria-label for accessibility
+            balanceElement.setAttribute('aria-label', `DOGE balance: ${formattedBalance} Dogecoin`);
         }
 
         if (doginalsCountElement) {
