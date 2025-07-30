@@ -479,19 +479,19 @@ class WalletUI {
             });
         }
 
-        // Enhanced tab switching
-        document.querySelectorAll('.tab-button').forEach(button => {
+        // Enhanced tab switching - updated for new UI
+        document.querySelectorAll('.tab-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 const tabName = e.target.id.replace('tab_', '');
-                this.switchToTab(tabName);
+                this.switchTab(tabName);
             });
         });
 
-        // Copy button with enhanced feedback
+        // Copy button with enhanced feedback - updated for new UI
         const copyAddressBtn = document.getElementById('copy_address_button');
         if (copyAddressBtn) {
             copyAddressBtn.addEventListener('click', () => {
-                const address = document.getElementById('wallet_address').textContent;
+                const address = wallet.getAddress();
                 this.copyToClipboard(address, copyAddressBtn);
             });
         }
@@ -801,7 +801,7 @@ class WalletUI {
     showWalletScreen() {
         this.showScreen('wallet_screen');
         this.updateWalletDisplay();
-        this.switchTab('overview');
+        this.switchTab('history'); // Start with history tab in new UI
         
         // Extra safety check to ensure loading screen is hidden
         setTimeout(() => {
@@ -817,32 +817,45 @@ class WalletUI {
      * Switch wallet tabs
      */
     switchTab(tabId) {
-        // Update tab buttons
-        const tabButtons = document.querySelectorAll('.tab-button');
+        // Map old tab IDs to new ones for backward compatibility
+        const tabMap = {
+            'overview': 'history',
+            'doginals': 'inscriptions',
+            'tokens': 'tokens',
+            'history': 'history',
+            'inscriptions': 'inscriptions'
+        };
+        
+        const actualTabId = tabMap[tabId] || tabId;
+        
+        // Update tab buttons - use new .tab-btn class
+        const tabButtons = document.querySelectorAll('.tab-btn');
         tabButtons.forEach(btn => {
             btn.classList.remove('active');
         });
 
-        const activeTabBtn = document.getElementById(`tab_${tabId}`);
+        const activeTabBtn = document.getElementById(`tab_${actualTabId}`);
         if (activeTabBtn) {
             activeTabBtn.classList.add('active');
         }
 
-        // Update tab content
+        // Update tab content using new data-tab-content attribute
         const tabContents = document.querySelectorAll('.tab-content');
         tabContents.forEach(content => {
+            content.style.display = 'none';
             content.classList.remove('active');
         });
 
-        const activeTabContent = document.getElementById(`${tabId}_tab`);
+        const activeTabContent = document.querySelector(`[data-tab-content="${actualTabId}"]`);
         if (activeTabContent) {
+            activeTabContent.style.display = 'block';
             activeTabContent.classList.add('active');
         }
 
-        this.currentTab = tabId;
+        this.currentTab = actualTabId;
 
         // Load tab-specific data
-        this.loadTabData(tabId);
+        this.loadTabData(actualTabId);
     }
 
     /**
@@ -851,6 +864,15 @@ class WalletUI {
     async loadTabData(tabId) {
         try {
             switch (tabId) {
+                case 'history':
+                    await this.updateHistoryTab();
+                    break;
+                case 'inscriptions':
+                    await this.updateDoginalsTab();
+                    break;
+                case 'tokens':
+                    await this.updateTokensTab();
+                    break;
                 case 'overview':
                     await this.updateOverviewTab();
                     break;
@@ -859,9 +881,6 @@ class WalletUI {
                     break;
                 case 'send':
                     await this.updateSendTab();
-                    break;
-                case 'history':
-                    await this.updateHistoryTab();
                     break;
             }
         } catch (error) {
@@ -1078,10 +1097,13 @@ class WalletUI {
     updateWalletDisplay() {
         if (!wallet.credentials) return;
 
-        // Update address
-        const addressElement = document.getElementById('wallet_address');
-        if (addressElement) {
-            addressElement.textContent = wallet.getAddress();
+        const address = wallet.getAddress();
+        
+        // Update address in new UI (short version)
+        const addressShortElement = document.getElementById('wallet_address_short');
+        if (addressShortElement) {
+            const shortAddress = address.slice(0, 6) + '...' + address.slice(-4);
+            addressShortElement.textContent = shortAddress;
         }
 
         // Update balance
@@ -1090,7 +1112,7 @@ class WalletUI {
             const balance = wallet.balance.total / 100000000; // Convert to DOGE
             // Format with appropriate decimals based on amount
             const formattedBalance = balance >= 1 ? balance.toFixed(2) : balance.toFixed(8);
-            balanceElement.textContent = `${formattedBalance} DOGE`;
+            balanceElement.textContent = formattedBalance;
             
             // Update aria-label for screen readers
             balanceElement.setAttribute('aria-label', `Current balance: ${formattedBalance} Dogecoin`);
@@ -1227,49 +1249,81 @@ class WalletUI {
     }
 
     /**
-     * Create history item element
+     * Create history item element - updated for new UI
      */
     createHistoryItem(tx) {
         const item = document.createElement('div');
-        item.className = 'history-item';
+        item.className = 'transaction-item-modern';
 
         const walletAddress = wallet.getAddress();
         const isReceived = tx.outputs.some(out => out.addresses && out.addresses.includes(walletAddress));
         const isSent = tx.inputs.some(inp => inp.addresses && inp.addresses.includes(walletAddress));
 
-        if (isReceived && !isSent) {
-            item.classList.add('received');
+        // Transaction info section
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'transaction-info';
+
+        const title = document.createElement('div');
+        title.className = 'transaction-title';
+        title.textContent = `Transaction #${tx.txid.substring(0, 8)}`;
+
+        const time = document.createElement('div');
+        time.className = 'transaction-time';
+        if (tx.time) {
+            const date = new Date(tx.time * 1000);
+            const now = new Date();
+            const diffHours = Math.floor((now - date) / (1000 * 60 * 60));
+            
+            if (diffHours < 1) {
+                time.textContent = 'Less than 1 hour ago';
+            } else if (diffHours < 24) {
+                time.textContent = `${diffHours} hours ago`;
+            } else {
+                time.textContent = date.toLocaleDateString();
+            }
         } else {
-            item.classList.add('sent');
+            time.textContent = 'Pending';
         }
 
-        const main = document.createElement('div');
-        main.className = 'history-main';
+        infoDiv.appendChild(title);
+        infoDiv.appendChild(time);
 
-        const type = document.createElement('div');
-        type.className = 'history-type';
-        type.textContent = isReceived && !isSent ? 'Received' : 'Sent';
-
-        const address = document.createElement('div');
-        address.className = 'history-address';
-        address.textContent = tx.txid.substring(0, 16) + '...';
-
-        const date = document.createElement('div');
-        date.className = 'history-date';
-        date.textContent = tx.time ? new Date(tx.time * 1000).toLocaleDateString() : 'Pending';
-
-        main.appendChild(type);
-        main.appendChild(address);
-        main.appendChild(date);
-
+        // Amount and status section
+        const amountDiv = document.createElement('div');
+        
         const amount = document.createElement('div');
-        amount.className = 'history-amount';
-        amount.textContent = `${(tx.value / 100000000).toFixed(8)} DOGE`;
+        amount.className = 'transaction-amount';
+        
+        if (isReceived && !isSent) {
+            amount.classList.add('positive');
+            amount.textContent = `+${(tx.value / 100000000).toFixed(2)} DOGE`;
+        } else {
+            amount.classList.add('negative');
+            amount.textContent = `-${(tx.value / 100000000).toFixed(2)} DOGE`;
+        }
 
-        item.appendChild(main);
-        item.appendChild(amount);
+        const status = document.createElement('div');
+        status.className = 'transaction-status';
+        status.textContent = isReceived && !isSent ? 'Received' : 'Sent';
+
+        amountDiv.appendChild(amount);
+        amountDiv.appendChild(status);
+
+        item.appendChild(infoDiv);
+        item.appendChild(amountDiv);
 
         return item;
+    }
+
+    /**
+     * Update tokens tab
+     */
+    async updateTokensTab() {
+        const container = document.getElementById('tokens_tab');
+        if (!container) return;
+
+        // For now, just show a placeholder message
+        container.innerHTML = '<div class="loading-message">Token support coming soon!</div>';
     }
 
     /**
