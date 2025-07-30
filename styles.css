@@ -1,48 +1,48 @@
 /* ============================================
-   WOOF WALLET - DESKTOP-FIRST RESPONSIVE & ACCESSIBLE STYLES
+   WOOF WALLET - MODERN DARK CRYPTO UI INSPIRED DESIGN
    ============================================ */
 
-/* CSS Variables for Enhanced Design System */
+/* CSS Variables for Modern Dark Crypto Theme */
 :root {
-  /* Dogecoin-Themed Color Palette - High Contrast & Accessible */
-  --color-primary: #FFCC33;        /* Dogecoin Gold */
-  --color-primary-dark: #E6B82E;   /* Darker Gold */
-  --color-primary-light: #FFD966;  /* Lighter Gold */
-  --color-primary-hover: #FFD14D;  /* Hover Gold */
-  --color-secondary: #1E2A44;      /* Dogecoin Dark Blue */
-  --color-secondary-dark: #151F35; /* Darker Blue */
-  --color-secondary-light: #2A3A56; /* Lighter Blue */
-  --color-accent: #FF6B35;         /* Orange Accent */
-  --color-accent-dark: #E55A2B;    /* Darker Orange */
-  --color-accent-light: #FF8459;   /* Lighter Orange */
+  /* Modern Dark Crypto Color Palette */
+  --color-primary: #8B5CF6;        /* Purple Primary */
+  --color-primary-dark: #7C3AED;   /* Darker Purple */
+  --color-primary-light: #A78BFA;  /* Lighter Purple */
+  --color-primary-hover: #9333EA;  /* Hover Purple */
+  --color-secondary: #1E1B4B;      /* Deep Purple Navy */
+  --color-secondary-dark: #1E1B4B; /* Dark Purple Navy */
+  --color-secondary-light: #312E81; /* Light Purple Navy */
+  --color-accent: #10B981;         /* Green Accent for positive amounts */
+  --color-accent-dark: #059669;    /* Darker Green */
+  --color-accent-light: #34D399;   /* Lighter Green */
   
-  /* Surface Colors */
-  --color-surface: #ffffff;
-  --color-surface-alt: #f8fafc;
-  --color-surface-hover: #f1f5f9;
-  --color-border: #e2e8f0;
-  --color-border-light: #f1f5f9;
-  --color-border-focus: #FFCC33;
+  /* Dark Theme Surface Colors */
+  --color-surface: #1F2937;        /* Dark Gray */
+  --color-surface-alt: #111827;    /* Darker Gray */
+  --color-surface-hover: #374151;  /* Hover Gray */
+  --color-border: #374151;         /* Border Gray */
+  --color-border-light: #4B5563;   /* Light Border */
+  --color-border-focus: #8B5CF6;   /* Purple Focus */
   
-  /* Background Gradients */
-  --bg-gradient-primary: linear-gradient(135deg, #FFCC33 0%, #1E2A44 100%);
-  --bg-gradient-accent: linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%);
-  --bg-gradient-surface: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  --bg-card: rgba(255, 255, 255, 0.98);
-  --bg-card-hover: rgba(255, 255, 255, 1);
-  --bg-overlay: rgba(0, 0, 0, 0.4);
-  --bg-overlay-dark: rgba(0, 0, 0, 0.6);
+  /* Modern Dark Background Gradients */
+  --bg-gradient-primary: linear-gradient(135deg, #1E1B4B 0%, #7C3AED 50%, #1E1B4B 100%);
+  --bg-gradient-accent: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+  --bg-gradient-surface: linear-gradient(180deg, #374151 0%, #1F2937 100%);
+  --bg-card: rgba(31, 41, 55, 0.95);
+  --bg-card-hover: rgba(55, 65, 81, 0.98);
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  --bg-overlay-dark: rgba(0, 0, 0, 0.8);
   
-  /* Text Colors - Enhanced Contrast for WCAG AA+ */
-  --text-primary: #1a202c;        /* Darker for better contrast */
-  --text-secondary: #2d3748;      /* Improved contrast ratio */
-  --text-tertiary: #4a5568;       /* Enhanced readability */
+  /* Dark Theme Text Colors - High Contrast */
+  --text-primary: #F9FAFB;         /* Light gray for primary text */
+  --text-secondary: #E5E7EB;       /* Slightly dimmed for secondary */
+  --text-tertiary: #D1D5DB;        /* Muted for tertiary */
   --text-light: #ffffff;
-  --text-muted: #94a3b8;
-  --text-error: #dc2626;
-  --text-success: #059669;
-  --text-warning: #d97706;
-  --text-info: #0284c7;
+  --text-muted: #9CA3AF;
+  --text-error: #EF4444;
+  --text-success: #10B981;
+  --text-warning: #F59E0B;
+  --text-info: #3B82F6;
   
   /* Enhanced Typography Scale */
   --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -1455,10 +1455,12 @@ textarea {
   margin: var(--space-xl) 0;
 }
 
-/* Wallet Main Interface */
+/* Wallet Main Interface - Modern Dark Crypto Theme */
 #wallet_screen {
-  background: #f8fafc;
+  background: var(--bg-gradient-primary);
   color: var(--text-primary);
+  min-height: 100vh;
+  position: relative;
 }
 
 .wallet-header {
@@ -1533,18 +1535,16 @@ textarea {
 }
 
 .balance-amount {
-  font-size: clamp(var(--font-3xl), 4vw, var(--font-5xl));
+  font-size: clamp(var(--font-4xl), 6vw, 4rem);
   font-weight: var(--font-weight-bold);
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  line-height: 1.2;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  line-height: 1.1;
+  color: var(--text-light);
   position: relative;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-4);
   transition: all var(--transition-medium);
   animation: fadeInUp var(--animation-duration) ease-out;
+  letter-spacing: -0.02em;
 }
 
 .balance-amount:hover {
@@ -1951,15 +1951,18 @@ textarea {
   }
 }
 
-/* Enhanced Wallet Content */
+/* Enhanced Wallet Content - Modern Dark Theme */
 .wallet-content {
   flex: 1;
-  background: var(--color-surface);
+  background: var(--color-surface-alt);
   min-height: 60vh;
   border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
+  margin: var(--space-6);
+  margin-top: 0;
+  padding: var(--space-6);
 }
 
 .wallet-content::before {
@@ -1972,290 +1975,201 @@ textarea {
   background: var(--bg-gradient-primary);
 }
 
-/* Enhanced Overview Tab */
-.overview-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-6);
-  margin-bottom: var(--space-8);
-}
-
-@media (min-width: 1024px) {
-  .overview-stats {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-8);
-  }
-}
-
-@media (max-width: 767px) {
-  .overview-stats {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
-}
-
-.stat-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
-  padding: var(--space-6);
+/* Modern Crypto Wallet Balance Card */
+.crypto-balance-card {
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  margin: var(--space-6);
   text-align: center;
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(20px);
 }
 
-.stat-card::before {
+.crypto-balance-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: var(--bg-gradient-primary);
-  transform: scaleX(0);
-  transition: var(--transition-normal);
-  transform-origin: left;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(139, 92, 246, 0.1) 0%, transparent 50%, rgba(139, 92, 246, 0.1) 100%);
+  pointer-events: none;
 }
 
-.stat-card:hover {
-  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.2), 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-6px) scale(1.02);
-  border-color: var(--color-primary);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 0.98) 100%);
-}
-
-.stat-card:hover::before {
-  transform: scaleX(1);
-}
-
-.stat-label {
-  font-size: var(--font-sm);
-  color: var(--text-tertiary);
-  margin-bottom: var(--space-3);
-  text-transform: uppercase;
-  letter-spacing: 0.075em;
-  font-weight: var(--font-weight-medium);
-}
-
-.stat-value {
-  font-size: clamp(var(--font-2xl), 3vw, var(--font-3xl));
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  line-height: var(--line-height-tight);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-  animation: gradient-shift 3s ease-in-out infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.stat-value::after {
-  content: attr(data-value);
-  position: absolute;
-  top: 0;
-  left: 0;
-  color: var(--text-primary);
-  z-index: -1;
-}
-
-/* Enhanced Quick Actions */
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-6);
-  margin-top: var(--space-8);
-}
-
-@media (min-width: 1024px) {
-  .quick-actions {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-8);
-  }
-}
-
-@media (max-width: 767px) {
-  .quick-actions {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
-}
-
-.action-button {
-  background: var(--bg-gradient-primary);
-  color: var(--text-light);
-  border: none;
-  padding: var(--space-6) var(--space-8);
-  border-radius: var(--radius-2xl);
-  cursor: pointer;
-  transition: var(--transition-normal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-lg);
-  min-height: var(--touch-target-xl);
-  box-shadow: var(--shadow-lg);
-  position: relative;
-  overflow: hidden;
-  outline: none;
-}
-
-.action-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left var(--transition-slow);
-}
-
-.action-button:hover::before {
-  left: 100%;
-}
-
-.action-button:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: var(--shadow-2xl);
-  background: linear-gradient(135deg, var(--color-primary-hover), var(--color-secondary-dark));
-}
-
-.action-button:focus {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-.action-button:active {
-  transform: translateY(-1px) scale(1.01);
-  transition: var(--transition-fast);
-}
-
-.action-icon {
-  font-size: var(--font-xl);
-  line-height: 1;
-}
-
-/* Tab Headers */
-.tab-header {
+.wallet-header-modern {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-xl);
-  padding-bottom: var(--space-lg);
-  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: var(--space-6);
+  padding: 0 var(--space-4);
 }
 
-.tab-header h3 {
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.refresh-button {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  min-width: var(--touch-target);
-  min-height: var(--touch-target);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-normal);
+.wallet-title {
   font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.wallet-address-short {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  font-family: var(--font-family-mono);
+  background: var(--color-surface-hover);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.main-balance {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: var(--space-6) 0;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.balance-currency {
+  font-size: var(--font-xl);
+  color: var(--text-muted);
+  margin-left: var(--space-2);
+}
+
+.action-buttons-modern {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.action-btn-modern {
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-medium);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
 }
 
-.refresh-button:hover {
-  background: #e2e8f0;
-  transform: rotate(180deg);
-  color: var(--text-primary);
-}
-
-/* Send Form */
-.send-form {
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.send-form .form-group {
-  margin-bottom: var(--space-xl);
-}
-
-.send-form label {
-  color: var(--text-primary);
-  font-size: var(--font-sm);
-  font-weight: 600;
-  margin-bottom: var(--space-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.send-form input {
-  background: #ffffff;
-  border: 2px solid #e2e8f0;
-  color: var(--text-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  font-size: var(--font-base);
-  transition: all var(--transition-normal);
-  min-height: var(--touch-target);
-}
-
-.send-form input:focus {
-  border-color: var(--color-secondary);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: #ffffff;
-}
-
-.balance-info {
-  margin-top: var(--space-3);
-  font-size: var(--font-sm);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  background: rgba(102, 126, 234, 0.05);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  transition: all 0.3s ease;
-}
-
-.balance-info:focus-within {
+.action-btn-modern:hover {
+  background: var(--bg-card-hover);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
 }
 
-.safety-check {
-  background: rgba(5, 150, 105, 0.1);
-  border: 1px solid var(--text-success);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  margin-bottom: var(--space-xl);
-}
-
-.safety-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  color: var(--text-success);
-  font-size: var(--font-sm);
-  font-weight: 500;
-}
-
-.safety-icon {
+.action-btn-modern .btn-icon {
   font-size: var(--font-lg);
-  line-height: 1;
+}
+
+/* Modern Transaction History Cards */
+.transaction-item-modern {
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all var(--transition-medium);
+}
+
+.transaction-item-modern:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--color-border-light);
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.transaction-title {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+}
+
+.transaction-time {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+.transaction-amount {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-lg);
+  text-align: right;
+}
+
+.transaction-amount.positive {
+  color: var(--text-success);
+}
+
+.transaction-amount.negative {
+  color: var(--text-error);
+}
+
+.transaction-status {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* Bottom Navigation Modern */
+.bottom-nav-modern {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-6);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+}
+
+.nav-item-modern {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all var(--transition-medium);
+  border-radius: var(--radius-md);
+}
+
+.nav-item-modern.active,
+.nav-item-modern:hover {
+  color: var(--color-primary);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.nav-item-modern .nav-icon {
+  font-size: var(--font-lg);
+}
+
+.nav-item-modern .nav-label {
+  font-size: var(--font-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 /* ============================================
@@ -3380,4 +3294,224 @@ body.show-motion-indicator .motion-indicator {
   .card-interactive {
     cursor: pointer;
   }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - MOBILE OPTIMIZATIONS
+   ============================================ */
+
+/* Mobile optimization for crypto balance card */
+@media (max-width: 768px) {
+  .crypto-balance-card {
+    margin: var(--space-4);
+    padding: var(--space-6);
+  }
+  
+  .main-balance {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+  
+  .action-buttons-modern {
+    gap: var(--space-3);
+  }
+  
+  .wallet-content {
+    margin: var(--space-4);
+    padding: var(--space-4);
+    margin-bottom: 100px; /* Account for bottom nav */
+  }
+  
+  .overview-stats {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-3) !important;
+  }
+  
+  .transaction-item-modern {
+    padding: var(--space-3);
+  }
+  
+  .bottom-nav-modern {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .nav-item-modern .nav-icon {
+    font-size: var(--font-base);
+  }
+  
+  .nav-item-modern .nav-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* Hide original wallet header on mobile for clean look */
+@media (max-width: 768px) {
+  .wallet-header {
+    display: none;
+  }
+  
+  #wallet_screen {
+    padding-top: 0;
+  }
+}
+
+/* Enhanced stat cards for mobile */
+.stat-card {
+  background: var(--bg-card);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  border: 1px solid var(--color-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--bg-gradient-accent);
+  transform: scaleX(0);
+  transition: var(--transition-medium);
+  transform-origin: left;
+}
+
+.stat-card:hover {
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  background: var(--bg-card-hover);
+}
+
+.stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+.stat-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  font-weight: var(--font-weight-medium);
+}
+
+.stat-value {
+  font-size: var(--font-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  line-height: var(--line-height-tight);
+}
+
+/* Improved form styling for dark theme */
+.send-form {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin: var(--space-4);
+  border: 1px solid var(--color-border);
+}
+
+.send-form input {
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  transition: all var(--transition-medium);
+}
+
+.send-form input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  background: var(--color-surface);
+}
+
+.send-form label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-2);
+}
+
+/* Enhanced primary button for dark theme */
+.primary-button {
+  background: var(--bg-gradient-accent);
+  color: var(--text-light);
+  border: none;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-medium);
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+}
+
+/* Loading states and animations */
+.loading-spinner {
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto var(--space-4);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Accessibility improvements for dark theme */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus states for better accessibility */
+.action-btn-modern:focus,
+.nav-item-modern:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Final polish - smooth transitions for theme */
+* {
+  transition: background-color var(--transition-medium), 
+              border-color var(--transition-medium),
+              color var(--transition-medium);
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }
