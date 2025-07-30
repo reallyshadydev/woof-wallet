@@ -1095,14 +1095,87 @@ textarea {
     }
 }
 
-/* Focus Styles */
+/* Focus Styles - Enhanced for better accessibility */
 button:focus,
 input:focus,
 textarea:focus,
 .tab-btn:focus,
-.settings-btn:focus {
+.settings-btn:focus,
+.action-btn:focus,
+.primary-button:focus,
+.secondary-button:focus,
+.setup-option:focus,
+.refresh-button:focus,
+.copy-button:focus,
+.copy-address-btn:focus,
+.close-button:focus {
     outline: 2px solid #5d5fef;
     outline-offset: 2px;
+}
+
+/* Font Family Update */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Wallet Footer Styles */
+.wallet-footer {
+    padding: 20px;
+    border-top: 1px solid #e0e7ff;
+    margin-top: auto;
+    background: #ffffff;
+}
+
+.wallet-footer .settings-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.wallet-footer .settings-btn:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+/* Loading Button States */
+.button-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.button-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid #ffffff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: button-spinner 0.8s linear infinite;
+}
+
+@keyframes button-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error Message Containers */
+.form-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+    min-height: 16px;
 }
 
 /* Additional utility classes */
