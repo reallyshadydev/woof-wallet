@@ -617,7 +617,7 @@ class WalletUI {
         const quickReceiveBtn = document.getElementById('quick_receive_button');
         
         if (quickSendBtn) {
-            quickSendBtn.addEventListener('click', () => this.switchTab('send'));
+            quickSendBtn.addEventListener('click', () => this.showSendModal());
         }
         
         if (quickReceiveBtn) {
@@ -640,6 +640,15 @@ class WalletUI {
         const sendDoginalBtn = document.getElementById('send_doginal_button');
         if (sendDoginalBtn) {
             sendDoginalBtn.addEventListener('click', () => this.handleSendDoginal());
+        }
+
+        // Modal send doge
+        const modalSendBtn = document.getElementById('modal_send_doge_button');
+        if (modalSendBtn) {
+            modalSendBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleModalSendDoge();
+            });
         }
     }
 
@@ -1062,6 +1071,64 @@ class WalletUI {
     }
 
     /**
+     * Handle send DOGE from modal
+     */
+    async handleModalSendDoge() {
+        try {
+            const addressInput = document.getElementById('modal_send_address');
+            const amountInput = document.getElementById('modal_send_amount');
+            const feeInput = document.getElementById('modal_send_fee');
+            
+            const address = addressInput.value.trim();
+            const amount = parseFloat(amountInput.value);
+            const fee = parseFloat(feeInput.value);
+            
+            if (!address || !amount || !fee) {
+                throw new Error('Please fill in all fields');
+            }
+
+            // Validate address format
+            if (!address.match(/^[DN][A-Za-z0-9]{33}$/)) {
+                throw new Error('Invalid Dogecoin address format');
+            }
+
+            // Validate amount
+            const balance = wallet.getBalance();
+            if (amount + fee > balance.total) {
+                throw new Error('Insufficient balance (including fee)');
+            }
+
+            if (amount <= 0) {
+                throw new Error('Amount must be greater than 0');
+            }
+
+            if (fee < 0.1) {
+                throw new Error('Fee must be at least 0.1 DOGE');
+            }
+
+            this.setButtonLoading('modal_send_doge_button', true);
+            
+            const txid = await wallet.sendDoge(address, amount, fee);
+            
+            // Clear form and close modal
+            addressInput.value = '';
+            amountInput.value = '';
+            feeInput.value = '1.0';
+            
+            this.hideModal('send_modal');
+            this.showSuccessModal(txid);
+            
+            // Refresh wallet data after successful send
+            setTimeout(() => this.handleRefresh(), 1000);
+        } catch (error) {
+            console.error('Failed to send DOGE:', error);
+            this.showErrorModal('Failed to send DOGE: ' + error.message);
+        } finally {
+            this.setButtonLoading('modal_send_doge_button', false);
+        }
+    }
+
+    /**
      * Handle send doginal
      */
     async handleSendDoginal() {
@@ -1444,6 +1511,44 @@ class WalletUI {
             console.log('Copied to clipboard:', text);
         } catch (error) {
             console.error('Failed to copy to clipboard:', error);
+        }
+    }
+
+    /**
+     * Show send modal with enhanced functionality
+     */
+    showSendModal() {
+        if (!wallet.credentials) {
+            this.showErrorModal('Wallet not loaded. Please wait for the wallet to initialize.');
+            return;
+        }
+
+        // Update available balance in the modal
+        const balance = wallet.getBalance();
+        const modalBalanceElement = document.getElementById('modal_available_balance');
+        if (modalBalanceElement) {
+            modalBalanceElement.textContent = `${balance.total.toFixed(8)} DOGE`;
+        }
+
+        // Clear previous form values
+        const addressInput = document.getElementById('modal_send_address');
+        const amountInput = document.getElementById('modal_send_amount');
+        const feeInput = document.getElementById('modal_send_fee');
+        
+        if (addressInput) addressInput.value = '';
+        if (amountInput) amountInput.value = '';
+        if (feeInput) feeInput.value = '1.0';
+
+        // Clear any previous error messages
+        const errorElements = document.querySelectorAll('#send_modal .form-error');
+        errorElements.forEach(el => el.textContent = '');
+
+        // Show the modal
+        this.showModal('send_modal');
+
+        // Focus on the address input
+        if (addressInput) {
+            setTimeout(() => addressInput.focus(), 100);
         }
     }
 
