@@ -338,7 +338,7 @@
             </div>
         </header>
 
-        <nav id="navigation" class="wallet-tabs" role="tablist" aria-label="Wallet navigation">
+        <nav id="navigation" class="wallet-tabs" role="tablist" aria-label="Wallet navigation" style="display: none;">
             <button 
                 id="tab_overview" 
                 class="tab-button active" 
@@ -380,11 +380,40 @@
         <main id="main-content" class="wallet-content">
             <!-- Overview Tab -->
             <section id="overview_tab" class="tab-content active" role="tabpanel" aria-labelledby="tab_overview">
-                <div class="overview-stats" role="group" aria-label="Wallet statistics">
-                    <div class="stat-card" role="group" aria-labelledby="doge-balance-label">
-                        <div id="doge-balance-label" class="stat-label">DOGE Balance</div>
-                        <div id="overview_balance" class="stat-value" role="text" aria-live="polite">0 DOGE</div>
+                <!-- Modern Crypto Wallet Balance Card -->
+                <div class="crypto-balance-card">
+                    <div class="wallet-header-modern">
+                        <div class="wallet-title">
+                            <span>🐕</span>
+                            [SCRYPT.FUN]
+                        </div>
+                        <div class="wallet-address-short" id="wallet_address_short">
+                            D7P2Gq...8vY9
+                        </div>
                     </div>
+                    
+                    <div class="main-balance">
+                        <span id="overview_balance" role="text" aria-live="polite">1250.45</span>
+                        <span class="balance-currency">DOGE</span>
+                    </div>
+                    
+                    <div class="action-buttons-modern">
+                        <button id="quick_send_button" class="action-btn-modern" aria-describedby="send-description">
+                            <span class="btn-icon" aria-hidden="true">📤</span>
+                            Send
+                        </button>
+                        <button id="quick_receive_button" class="action-btn-modern" aria-describedby="receive-description">
+                            <span class="btn-icon" aria-hidden="true">📥</span>
+                            Receive
+                        </button>
+                    </div>
+                    
+                    <div id="send-description" class="sr-only">Send Dogecoin to another wallet</div>
+                    <div id="receive-description" class="sr-only">Get your wallet address to receive Dogecoin</div>
+                </div>
+                
+                <!-- Modern Stats Row -->
+                <div class="overview-stats" role="group" aria-label="Wallet statistics" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0;">
                     <div class="stat-card" role="group" aria-labelledby="doginals-count-label">
                         <div id="doginals-count-label" class="stat-label">Doginals</div>
                         <div id="overview_doginals_count" class="stat-value" role="text" aria-live="polite">0</div>
@@ -393,18 +422,10 @@
                         <div id="pending-txs-label" class="stat-label">Pending Txs</div>
                         <div id="overview_pending" class="stat-value" role="text" aria-live="polite">0</div>
                     </div>
-                </div>
-                <div class="quick-actions" role="group" aria-label="Quick actions">
-                    <button id="quick_send_button" class="action-button" aria-describedby="send-description">
-                        <span class="action-icon" aria-hidden="true">💸</span>
-                        Send DOGE
-                    </button>
-                    <button id="quick_receive_button" class="action-button" aria-describedby="receive-description">
-                        <span class="action-icon" aria-hidden="true">📥</span>
-                        Receive
-                    </button>
-                    <div id="send-description" class="sr-only">Send Dogecoin to another wallet</div>
-                    <div id="receive-description" class="sr-only">Get your wallet address to receive Dogecoin</div>
+                    <div class="stat-card" role="group" aria-labelledby="total-txs-label">
+                        <div id="total-txs-label" class="stat-label">Total Txs</div>
+                        <div id="overview_total_txs" class="stat-value" role="text" aria-live="polite">5</div>
+                    </div>
                 </div>
             </section>
 
@@ -498,7 +519,7 @@
             <!-- Transaction History Tab -->
             <section id="history_tab" class="tab-content" role="tabpanel" aria-labelledby="tab_history" aria-hidden="true">
                 <div class="tab-header">
-                    <h3>Transaction History</h3>
+                    <h3>History</h3>
                     <button 
                         id="refresh_history_button" 
                         class="refresh-button"
@@ -515,10 +536,88 @@
                     </select>
                 </div>
                 <div id="history_container" class="history-list" role="log" aria-live="polite" aria-label="Transaction history">
-                    <div class="loading-message">Loading transaction history...</div>
+                    <!-- Sample Modern Transaction Cards -->
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #1</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+40.15 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #2</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+26.98 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #3</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+7.28 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #4</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+37.71 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-item-modern">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Transaction #5</div>
+                            <div class="transaction-time">2 hours ago</div>
+                        </div>
+                        <div>
+                            <div class="transaction-amount positive">+15.54 DOGE</div>
+                            <div class="transaction-status">Received</div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
+        
+        <!-- Modern Bottom Navigation -->
+        <nav class="bottom-nav-modern" role="tablist" aria-label="Main navigation">
+            <a href="#" class="nav-item-modern active" role="tab" aria-selected="true" aria-controls="overview_tab" id="nav_overview">
+                <span class="nav-icon" aria-hidden="true">📊</span>
+                <span class="nav-label">History</span>
+            </a>
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="doginals_tab" id="nav_doginals">
+                <span class="nav-icon" aria-hidden="true">🖼️</span>
+                <span class="nav-label">Inscriptions</span>
+            </a>
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="send_tab" id="nav_send">
+                <span class="nav-icon" aria-hidden="true">📤</span>
+                <span class="nav-label">Tokens</span>
+            </a>
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="overview_tab" id="nav_mine">
+                <span class="nav-icon" aria-hidden="true">⛏️</span>
+                <span class="nav-label">Mine</span>
+            </a>
+            <a href="#" class="nav-item-modern" role="tab" aria-selected="false" aria-controls="history_tab" id="nav_settings">
+                <span class="nav-icon" aria-hidden="true">⚙️</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
     </div>
 
     <!-- Doginal Detail Modal -->
